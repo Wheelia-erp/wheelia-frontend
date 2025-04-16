@@ -1,9 +1,10 @@
 'use client';
 
 import { useAuth0 } from '@auth0/auth0-react';
+import Image from 'next/image';
 
 export default function HomePage() {
-  const { loginWithRedirect, logout, isAuthenticated, isLoading, user } = useAuth0();
+  const { loginWithRedirect, logout, isAuthenticated } = useAuth0();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white to-blue-50 flex flex-col justify-between">
@@ -28,9 +29,11 @@ export default function HomePage() {
 
       {/* Conteúdo central */}
       <main className="flex flex-col items-center justify-center text-center px-4">
-        <img
+        <Image
           src="/wheelia-logo.png" // substitua pela sua logo leve
           alt="Wheelia Logo"
+          width={800}
+          height={600}
           className="w-40 mb-6"
         />
 

@@ -1,7 +1,7 @@
 'use client';
 
-import { useAuth0 } from '@auth0/auth0-react';
-import { useEffect, useState } from 'react';
+import { useAuth0, User } from '@auth0/auth0-react';
+import { useState } from 'react';
 import axios from 'axios';
 
 export default function DashboardPage() {
@@ -14,7 +14,7 @@ export default function DashboardPage() {
     getAccessTokenSilently,
   } = useAuth0();
 
-  const [users, setUsers] = useState<any[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [loadingData, setLoadingData] = useState(false);
 
   const fetchUsers = async () => {

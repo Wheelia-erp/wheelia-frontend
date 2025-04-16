@@ -1,6 +1,7 @@
 'use client';
 
 import { useAuth0 } from '@auth0/auth0-react'; // substituiremos por Lucia futuramente
+import Image from 'next/image';
 
 export default function LoginPage() {
   const { loginWithRedirect, isLoading } = useAuth0();
@@ -75,10 +76,12 @@ export default function LoginPage() {
 
       {/* Lado direito (imagem/estilo leve) */}
       <div className="hidden md:flex w-[70%] bg-blue-50 p-10 items-center justify-center">
-        <img 
-          src="/woman_dashboard_wheelia.webp" 
-          alt="Ilustração Wheelia" 
-          className="h-[90vh] w-auto object-cover rounded-lg shadow-md"
+      <Image
+            src="/woman_dashboard_wheelia.webp"
+            alt="Ilustração Wheelia"
+            width={800}
+            height={600}
+            className="h-[90vh] w-auto object-cover rounded-lg shadow-md"
         />
       </div>
     </div>
