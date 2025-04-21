@@ -23,6 +23,7 @@ const navItems = [
 
 export default function Sidebar() {
   const pathname = usePathname();
+  
   const [openSection, setOpenSection] = useState<string | null>(() => {
     const match = navItems.find((item) =>
       item.children?.some((child) => pathname.startsWith(child.href))

@@ -1,12 +1,12 @@
 import './globals.css';
 import { Inter } from 'next/font/google';
-import { Auth0ProviderWithNavigate } from '@/auth/auth0-provider';
+import { Toaster } from 'sonner';
 
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata = {
   title: 'Wheelia',
-  description: 'Frontend multitenant com Auth0',
+  description: 'Plataforma inteligente de gestão recorrente',
 };
 
 export default function RootLayout({
@@ -17,7 +17,8 @@ export default function RootLayout({
   return (
     <html lang="pt-br">
       <body className={inter.className}>
-        <Auth0ProviderWithNavigate>{children}</Auth0ProviderWithNavigate>
+        {children}
+        <Toaster richColors position="top-right" />
       </body>
     </html>
   );
