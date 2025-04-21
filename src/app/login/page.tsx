@@ -1,12 +1,35 @@
 'use client';
 
-import { useAuth0 } from '@auth0/auth0-react'; // substituiremos por Lucia futuramente
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import Image from 'next/image';
 
 export default function LoginPage() {
-  const { loginWithRedirect, isLoading } = useAuth0();
+  const router = useRouter();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState('');
 
-  if (isLoading) return <p className="p-6">Carregando...</p>;
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setError('');
+
+    const res = await fetch('/api/login', {
+      method: 'POST',
+      body: JSON.stringify({ email, password }),
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+    if (res.ok) {
+      router.push('/dashboard');
+    } else {
+      const data = await res.json();
+      setError(data.message || 'Erro ao fazer login');
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <div className="min-h-screen flex bg-white">
@@ -17,7 +40,7 @@ export default function LoginPage() {
           <p className="text-gray-500">Plataforma inteligente de gestão recorrente</p>
         </div>
 
-        <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
+        <form className="space-y-4" onSubmit={handleLogin}>
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-700">
               E-mail
@@ -25,6 +48,8 @@ export default function LoginPage() {
             <input
               type="email"
               id="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500 text-gray-700 placeholder-gray-400"
               placeholder="seu@email.com"
               required
@@ -38,6 +63,8 @@ export default function LoginPage() {
             <input
               type="password"
               id="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500 text-gray-700 placeholder-gray-400"
               placeholder="••••••••"
               required
@@ -54,34 +81,32 @@ export default function LoginPage() {
           </div>
 
           <button
-            onClick={() => loginWithRedirect()}
-            className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition"
+            type="submit"
+            disabled={isSubmitting}
+            className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition disabled:opacity-50"
           >
-            Entrar
+            {isSubmitting ? 'Entrando...' : 'Entrar'}
           </button>
         </form>
 
+        {error && <p className="mt-4 text-sm text-red-500 text-center">{error}</p>}
+
         <p className="mt-6 text-sm text-gray-600 text-center">
           Ainda não tem conta?{' '}
-          <button
-            onClick={() =>
-              loginWithRedirect({ authorizationParams: { screen_hint: 'signup' } })
-            }
-            className="text-blue-600 hover:underline"
-          >
+          <a href="#" className="text-blue-600 hover:underline">
             Crie uma agora
-          </button>
+          </a>
         </p>
       </div>
 
-      {/* Lado direito (imagem/estilo leve) */}
+      {/* Lado direito (imagem) */}
       <div className="hidden md:flex w-[70%] bg-blue-50 p-10 items-center justify-center">
-      <Image
-            src="/woman_dashboard_wheelia.webp"
-            alt="Ilustração Wheelia"
-            width={800}
-            height={600}
-            className="h-[90vh] w-auto object-cover rounded-lg shadow-md"
+        <Image
+          src="/woman_dashboard_wheelia.webp"
+          alt="Ilustração Wheelia"
+          width={800}
+          height={600}
+          className="h-[90vh] w-auto object-cover rounded-lg shadow-md"
         />
       </div>
     </div>
