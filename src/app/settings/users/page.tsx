@@ -18,7 +18,7 @@ export default function UsersSettingsPage() {
   const handleSubmit = async (data: UserFormValues) => {
     try {
       setLoading(true);
-      await backendApi.post('/users', data);
+      await backendApi.post('/users', data, { withCredentials: true });
       toast.success('Usuário criado com sucesso!');
       setShowForm(false);
       setRefreshKey(prev => prev + 1);

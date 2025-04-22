@@ -17,11 +17,9 @@ export default function UserTable() {
   useEffect(() => {
     const load = async () => {
       setLoading(true);
-      try {
-        console.log('backendApi.getUri()', backendApi.getUri());
-        const response = await backendApi.get<User[]>('/users');
-        const { data } = response;
-        console.log('response.config', response.config);
+      try {        
+        const response = await backendApi.get<User[]>('/users', { withCredentials: true });
+        const { data } = response;        
         setUsers(data);
       } catch (err) {
         console.error('Erro ao carregar usuários:', err);
