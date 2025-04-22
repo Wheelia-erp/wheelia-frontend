@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import Image from 'next/image';
+import backendApi from '@/lib/backendApi';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -16,17 +17,11 @@ export default function LoginPage() {
     setIsSubmitting(true);
     setError('');
 
-    const res = await fetch('/api/login', {
-      method: 'POST',
-      body: JSON.stringify({ email, password }),
-      headers: { 'Content-Type': 'application/json' },
-    });
-
-    if (res.ok) {
+    try {
+      await backendApi.post('/auth/login', { email, password }, { withCredentials: true });
       router.push('/dashboard');
-    } else {
-      const data = await res.json();
-      setError(data.message || 'Erro ao fazer login');
+    } catch (err: any) {
+      setError(err?.response?.data?.message || 'Erro ao fazer login');
       setIsSubmitting(false);
     }
   };
