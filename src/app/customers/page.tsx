@@ -1,5 +1,4 @@
 import AppShell from '@/components/layout/AppShell';
-import CustomerTable from '@/components/customers/CustomerTable';
 
 export default function CustomersPage() {
   return (
@@ -11,8 +10,6 @@ export default function CustomersPage() {
             Novo Cliente
           </button>
         </div>
-
-        <CustomerTable />
       </div>
     </AppShell>
   );
