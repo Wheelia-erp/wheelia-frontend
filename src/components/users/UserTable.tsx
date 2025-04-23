@@ -17,9 +17,11 @@ interface Props {
   onView: (user: User) => void;
   // eslint-disable-next-line no-unused-vars
   onDelete: (user: User) => void;
+  // eslint-disable-next-line no-unused-vars
+  onChangeStatus: (user: User) => void;
 }
 
-export default function UserTable({ users, onEdit, onView, onDelete }: Props) {
+export default function UserTable({ users, onEdit, onView, onDelete, onChangeStatus }: Props) {
   return (
     <Table>
       <TableHead>
@@ -35,7 +37,7 @@ export default function UserTable({ users, onEdit, onView, onDelete }: Props) {
           <UserTableEmpty />
         ) : (
           users.map((user) => (
-            <UserRow key={user.id} user={user} onEdit={onEdit} onDelete={onDelete} onView={onView} />
+            <UserRow key={user.id} user={user} onEdit={onEdit} onDelete={onDelete} onView={onView} onChangeStatus={onChangeStatus} />
           ))
         )}
       </TableBody>

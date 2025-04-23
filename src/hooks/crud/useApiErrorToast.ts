@@ -13,11 +13,7 @@ export function useApiErrorToast() {
 function extractErrorMessage(err: unknown): string | null {
   if (!err) return null;
 
-  if (err instanceof Error) {
-    return err.message;
-  }
-
-  if ((err as AxiosError).response?.data) {
+  if ((err as AxiosError).response?.data) {    
     const data = (err as AxiosError).response!.data;
 
     if (typeof data === 'string') return data;
@@ -26,6 +22,10 @@ function extractErrorMessage(err: unknown): string | null {
       const message = (data as { message: string }).message;
       return typeof message === 'string' ? message : null;
     }
+  }
+
+  if (err instanceof Error) {   
+    return err.message;
   }
 
   return null;

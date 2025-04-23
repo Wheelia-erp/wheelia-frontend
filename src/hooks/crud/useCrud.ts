@@ -8,7 +8,7 @@ interface UseCrudOptions<T> {
 
 export function useCrud<T extends { id: string | number }>({ endpoint }: UseCrudOptions<T>) {
   const [items, setItems] = useState<T[]>([]);
-  const [itemBeingEdited, setItemBeingEdited] = useState<T | null>(null);
+  const [itemBeingEdited, setItemBeingEdited] = useState<T | null>(null);  
   const [isFormOpen, setFormOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -50,8 +50,21 @@ export function useCrud<T extends { id: string | number }>({ endpoint }: UseCrud
   const view = (item: T) => {
     setItemBeingEdited(item);
     setFormOpen(true);
-    setViewing(true);
+    setViewing(true);    
   }; 
+
+  const changeStatus = async (id: T["id"], status: boolean) => {
+    if (status) {
+      await backendApi.put(`${endpoint}/${id}/activate`, {
+        withCredentials: true,
+      });
+    } else {
+      await backendApi.put(`${endpoint}/${id}/inactivate`, {
+        withCredentials: true,
+      });
+    }
+    setItems((prev) => prev.filter((item) => item.id !== id));
+  };
 
   const remove = async (id: T['id']) => {
     await backendApi.delete(`${endpoint}/${id}`, { withCredentials: true });
@@ -116,6 +129,7 @@ export function useCrud<T extends { id: string | number }>({ endpoint }: UseCrud
     create,
     update,
     remove,
+    changeStatus,
     reload: load,
   };
 }

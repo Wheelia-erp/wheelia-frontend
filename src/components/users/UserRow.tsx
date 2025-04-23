@@ -13,6 +13,7 @@ export default function UserRow({
   onEdit, 
   onView,
   onDelete,
+  onChangeStatus, 
 }: { 
   user: User,
   // eslint-disable-next-line no-unused-vars
@@ -21,13 +22,14 @@ export default function UserRow({
   onView: (user: User) => void,
   // eslint-disable-next-line no-unused-vars
   onDelete: (user: User) => void,
+  // eslint-disable-next-line no-unused-vars
+  onChangeStatus: (user: User) => void,
 }) {
   const [selected, setSelected] = useState(false);
 
   const handleClick = () => {
     setSelected(true);
-    onView(user);
-    onDelete(user);
+    onView(user);    
     console.log('Visualizar usuário', user.id);
   };
 
@@ -54,7 +56,17 @@ export default function UserRow({
         </span>
       </TableCell>
       <TableCell align="right">
+        
         <RowActions>
+          <button 
+            className="w-full px-3 py-2 rounded-md hover:bg-gray-50 text-left"             
+            onClick={(e) => {
+                e.stopPropagation();                
+                onChangeStatus(user);
+              }
+            }>
+            {user.isActive ? 'Desativar' : 'Ativar'}            
+          </button>
           <button 
             className="w-full px-3 py-2 rounded-md hover:bg-gray-50 text-left"             
             onClick={(e) => {

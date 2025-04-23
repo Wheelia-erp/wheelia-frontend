@@ -9,7 +9,6 @@ import { toast } from 'sonner';
 import { User } from '@/modules/users/user.types';
 import { useApiErrorToast } from '@/hooks/crud/useApiErrorToast';
 
-
 export default function UsersSettingsPage() {
   const {
     items: users,
@@ -23,6 +22,7 @@ export default function UsersSettingsPage() {
     create,
     update,
     remove,
+    changeStatus,
     reload,
   } = useCrud<User>({ endpoint: '/users' });
 
@@ -39,7 +39,7 @@ export default function UsersSettingsPage() {
       cancelForm();
       reload();
     } catch (err) {
-      showError(err); // 💥 aqui é onde entra o hook!
+      showError(err); 
     }
   };
 
@@ -50,9 +50,20 @@ export default function UsersSettingsPage() {
       reload();
     } catch (err) {
       console.error(err);
-      toast.error('Erro ao excluir o usuário.');
+      showError(err); 
     }
   };  
+
+  const handleStatusChange = async (user: User) => {
+    try {
+      const status = !user.isActive;
+      await changeStatus(user.id, status);
+      toast.success('Status do usuário alterado com sucesso!');
+      reload();
+    } catch(err) {
+      showError(err); 
+    }
+  }; 
 
   return (
     <AppShell>
@@ -80,7 +91,7 @@ export default function UsersSettingsPage() {
             loading={loading}
           />
         ) : (
-          <UserTable users={users} onEdit={openForm} onView={view} onDelete={handleDelete} />
+          <UserTable users={users} onEdit={openForm} onView={view} onDelete={handleDelete} onChangeStatus={handleStatusChange} />
         )}
       </div>
     </AppShell>
