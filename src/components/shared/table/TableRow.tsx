@@ -1,6 +1,16 @@
-export default function TableRow({ children }: { children: React.ReactNode }) {
-    return (
-      <tr className="border-t hover:bg-gray-50 transition">{children}</tr>
-    );
-  }
-  
+import { cn } from '@/lib/utils';
+import { HTMLAttributes } from 'react';
+
+interface TableRowProps extends HTMLAttributes<HTMLTableRowElement> {}
+
+export default function TableRow({ className, ...props }: TableRowProps) {
+  return (
+    <tr
+      className={cn(
+        'border-b last:border-none transition-colors',
+        className
+      )}
+      {...props}
+    />
+  );
+}

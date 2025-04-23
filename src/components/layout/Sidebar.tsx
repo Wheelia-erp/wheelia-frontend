@@ -2,9 +2,22 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Users, CreditCard, DollarSign, Settings, ChevronDown, ChevronRight } from 'lucide-react';
+import {
+  Home,
+  Users,
+  CreditCard,
+  DollarSign,
+  Settings,
+  ChevronDown,
+  ChevronRight,
+} from 'lucide-react';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { cn } from '@/lib/utils';
+
+interface SidebarProps {
+  collapsed: boolean;
+}
 
 const navItems = [
   { label: 'Dashboard', icon: Home, href: '/dashboard' },
@@ -21,9 +34,9 @@ const navItems = [
   },
 ];
 
-export default function Sidebar() {
+export default function Sidebar({ collapsed }: SidebarProps) {
   const pathname = usePathname();
-  
+
   const [openSection, setOpenSection] = useState<string | null>(() => {
     const match = navItems.find((item) =>
       item.children?.some((child) => pathname.startsWith(child.href))
@@ -32,10 +45,13 @@ export default function Sidebar() {
   });
 
   return (
-    <aside className="w-64 bg-white border-r border-gray-100 px-4 py-6">
-      <div className="text-2xl font-bold text-blue-700 mb-8">Wheelia</div>
-
-      <nav className="space-y-2 text-sm text-gray-700">
+    <aside
+      className={cn(
+        'transition-all duration-300 bg-[#1E293B] text-white pt-16 shadow h-screen',
+        collapsed ? 'w-16 px-2' : 'w-60 px-4 py-6'
+      )}
+    >
+      <nav className="space-y-2 text-sm">
         {navItems.map(({ label, icon: Icon, href, children }) => {
           const isActive = href && pathname.startsWith(href);
           const isOpen = openSection === label;
@@ -45,14 +61,16 @@ export default function Sidebar() {
               <Link
                 key={label}
                 href={href!}
-                className={`flex items-center space-x-3 px-3 py-2 rounded-md transition ${
+                className={cn(
+                  'flex items-center space-x-3 px-3 py-2 rounded-md transition',
                   isActive
-                    ? 'bg-blue-100 text-blue-700 font-semibold'
-                    : 'hover:bg-gray-50'
-                }`}
+                    ? 'bg-white/20 text-white font-semibold'
+                    : 'hover:bg-white/10 text-white/80',
+                  collapsed && 'justify-center px-2'
+                )}
               >
                 <Icon size={18} />
-                <span>{label}</span>
+                {!collapsed && <span>{label}</span>}
               </Link>
             );
           }
@@ -60,22 +78,22 @@ export default function Sidebar() {
           return (
             <div key={label}>
               <button
-                onClick={() =>
-                  setOpenSection(isOpen ? null : label)
-                }
-                className={`flex items-center w-full space-x-3 px-3 py-2 rounded-md transition ${
-                  isOpen || children.some((c) => pathname.startsWith(c.href))
-                    ? 'bg-blue-50 text-blue-700 font-semibold'
-                    : 'hover:bg-gray-50'
-                }`}
+                onClick={() => setOpenSection(isOpen ? null : label)}
+                className={cn(
+                  'flex items-center w-full space-x-3 px-3 py-2 rounded-md transition',
+                  (isOpen || children.some((c) => pathname.startsWith(c.href)))
+                    ? 'bg-white/10 text-white font-semibold'
+                    : 'hover:bg-white/10 text-white/80',
+                  collapsed && 'justify-center px-2'
+                )}
               >
                 <Icon size={18} />
-                <span className="flex-1 text-left">{label}</span>
-                {isOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+                {!collapsed && <span className="flex-1 text-left">{label}</span>}
+                {!collapsed && (isOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />)}
               </button>
 
-              <AnimatePresence initial={false}>
-                {isOpen && (
+              {!collapsed && isOpen && (
+                <AnimatePresence initial={false}>
                   <motion.div
                     key="submenu"
                     initial={{ opacity: 0, height: 0 }}
@@ -91,11 +109,12 @@ export default function Sidebar() {
                           <Link
                             key={child.href}
                             href={child.href}
-                            className={`block px-3 py-1 rounded-md text-sm ${
+                            className={cn(
+                              'block px-3 py-1 rounded-md text-sm',
                               isChildActive
-                                ? 'text-blue-600 font-medium bg-blue-100'
-                                : 'hover:text-blue-700'
-                            }`}
+                                ? 'bg-white/20 text-white font-medium'
+                                : 'hover:text-white/90 text-white/70'
+                            )}
                           >
                             {child.label}
                           </Link>
@@ -103,8 +122,8 @@ export default function Sidebar() {
                       })}
                     </div>
                   </motion.div>
-                )}
-              </AnimatePresence>
+                </AnimatePresence>
+              )}
             </div>
           );
         })}

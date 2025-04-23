@@ -2,69 +2,85 @@
 
 import AppShell from '@/components/layout/AppShell';
 import UserTable from '@/components/users/UserTable';
-import { UserForm, UserFormValues } from '@/components/users/UserForm';
-import { useState } from 'react';
+import { UserFormWrapper } from '@/components/users/UserFormWrapper';
+import { UserFormValues } from '@/components/users/UserForm';
+import { useCrud } from '@/hooks/crud/useCrud';
 import { toast } from 'sonner';
-import backendApi from '@/lib/backendApi';
+import { User } from '@/modules/users/user.types';
+import { useApiErrorToast } from '@/hooks/crud/useApiErrorToast';
+
 
 export default function UsersSettingsPage() {
-  const [showForm, setShowForm] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [refreshKey, setRefreshKey] = useState(0);
+  const {
+    items: users,
+    itemBeingEdited,
+    isViewing,
+    isFormOpen,
+    loading,
+    openForm,
+    view,
+    cancelForm,    
+    create,
+    update,
+    remove,
+    reload,
+  } = useCrud<User>({ endpoint: '/users' });
 
-  const handleNew = () => setShowForm(true);
-  const handleCancel = () => setShowForm(false);
-
+  const { show: showError } = useApiErrorToast();
   const handleSubmit = async (data: UserFormValues) => {
     try {
-      setLoading(true);
-      await backendApi.post('/users', data, { withCredentials: true });
-      toast.success('Usuário criado com sucesso!');
-      setShowForm(false);
-      setRefreshKey(prev => prev + 1);
+      if (itemBeingEdited) {
+        await update(itemBeingEdited.id, data);
+        toast.success('Usuário atualizado com sucesso!');
+      } else {
+        await create(data);
+        toast.success('Usuário criado com sucesso!');
+      }
+      cancelForm();
+      reload();
     } catch (err) {
-      console.error('Erro ao criar usuário:', err);
-      toast.error('Erro ao criar usuário');
-    } finally {
-      setLoading(false);
+      showError(err); // 💥 aqui é onde entra o hook!
     }
   };
+
+  const handleDelete = async (user: User) => {
+    try {
+      await remove(user.id);
+      toast.success('Usuário excluído com sucesso!');
+      reload();
+    } catch (err) {
+      console.error(err);
+      toast.error('Erro ao excluir o usuário.');
+    }
+  };  
 
   return (
     <AppShell>
       <div className="p-6 space-y-4">
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-bold">Usuários</h1>
-          {!showForm && (
+          {!isFormOpen && (
             <button
               className="bg-blue-600 text-white px-4 py-2 rounded"
-              onClick={handleNew}
+              onClick={() => openForm()}
             >
               Novo Usuário
             </button>
           )}
         </div>
 
-        {/* Exibe somente o formulário ou a tabela */}
-        {showForm ? (
-          <div className="bg-white shadow rounded p-4">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-semibold">Novo Usuário</h2>
-              <button
-                className="text-gray-500 hover:text-gray-700"
-                onClick={handleCancel}
-              >
-                Cancelar
-              </button>
-            </div>
-            <UserForm
-              onSubmit={handleSubmit}
-              onCancel={handleCancel}
-              loading={loading}
-            />
-          </div>
+        {isFormOpen ? (
+          <UserFormWrapper
+            title={itemBeingEdited ? 'Editar Usuário' : 'Novo Usuário'}
+            defaultValues={itemBeingEdited ?? undefined}
+            isEditing={!!isViewing && !!itemBeingEdited}
+            readOnly={isViewing}
+            onSubmit={handleSubmit}
+            onCancel={cancelForm}            
+            loading={loading}
+          />
         ) : (
-          <UserTable key={refreshKey} />
+          <UserTable users={users} onEdit={openForm} onView={view} onDelete={handleDelete} />
         )}
       </div>
     </AppShell>

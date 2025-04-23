@@ -1,66 +1,44 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import Table from '@/components/shared/table/Table';
-import TableHeader from '@/components/shared/table/TableHeader';
-import TableBody from '@/components/shared/table/TableBody';
-import TableEmptyState from '@/components/shared/table/TableEmptyState';
-import UserRow from '@/components/users/UserRow';
 import { User } from '@/modules/users/user.types';
-import backendApi  from "@/lib/backendApi";
+import Table from '@/components/shared/table/Table';
+import TableHead from '@/components/shared/table/TableHead';
+import TableBody from '@/components/shared/table/TableBody';
+import TableHeader from '@/components/shared/table/TableHeader';
+import UserRow from './UserRow';
+import UserTableEmpty from '@/components/shared/table/TableEmpty';
+import TableHeaderRow from '../shared/table/TableHarderRow';
 
-export default function UserTable() {  
-  const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+interface Props {
+  users: User[];
+  // eslint-disable-next-line no-unused-vars
+  onEdit: (user: User) => void;
+  // eslint-disable-next-line no-unused-vars
+  onView: (user: User) => void;
+  // eslint-disable-next-line no-unused-vars
+  onDelete: (user: User) => void;
+}
 
-  useEffect(() => {
-    const load = async () => {
-      setLoading(true);
-      try {        
-        const response = await backendApi.get<User[]>('/users', { withCredentials: true });
-        const { data } = response;        
-        setUsers(data);
-      } catch (err) {
-        console.error('Erro ao carregar usuários:', err);
-        setError('Erro ao carregar usuários');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    load();
-  }, []);
-
+export default function UserTable({ users, onEdit, onView, onDelete }: Props) {
   return (
-    <div>
     <Table>
-      <TableHeader headers={['Nome', 'Email', 'Status', 'Ações']} />
+      <TableHead>
+        <TableHeaderRow>
+          <TableHeader>Nome</TableHeader>
+          <TableHeader>E-mail</TableHeader>
+          <TableHeader>Status</TableHeader>
+          <TableHeader align="right">Ações</TableHeader>
+        </TableHeaderRow>
+      </TableHead>
       <TableBody>
-        {loading && (
-          <tr>
-            <td colSpan={4} className="text-center p-4 text-sm text-gray-500">
-              Carregando...
-            </td>
-          </tr>
+        {users.length === 0 ? (
+          <UserTableEmpty />
+        ) : (
+          users.map((user) => (
+            <UserRow key={user.id} user={user} onEdit={onEdit} onDelete={onDelete} onView={onView} />
+          ))
         )}
-
-        {error && (
-          <tr>
-            <td colSpan={4} className="text-center p-4 text-sm text-red-500">
-              {error}
-            </td>
-          </tr>
-        )}
-
-        {!loading && !error && users.length === 0 && (
-          <TableEmptyState colSpan={4} />
-        )}
-
-        {!loading &&
-          users.map((user) => <UserRow key={user.id} user={user} />)}
       </TableBody>
-    </Table>    
-    </div>
+    </Table>
   );
 }

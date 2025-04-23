@@ -1,22 +1,28 @@
+import { cn } from '@/lib/utils';
+import { HTMLAttributes, ReactNode } from 'react';
+
+interface TableCellProps extends HTMLAttributes<HTMLTableCellElement> {
+  children: ReactNode;
+  align?: 'left' | 'center' | 'right';
+}
+
 export default function TableCell({
-    children,
-    align = 'left',
-    colSpan,
-  }: {
-    children: React.ReactNode;
-    align?: 'left' | 'right' | 'center';
-    colSpan?: number;
-  }) {
-    const alignment = {
-      left: 'text-left',
-      right: 'text-right',
-      center: 'text-center',
-    }[align];
-  
-    return (
-      <td className={`p-3 ${alignment}`} colSpan={colSpan}>
-        {children}
-      </td>
-    );
-  }
-  
+  children,
+  className,
+  align = 'left',
+  ...props
+}: TableCellProps) {
+  return (
+    <td
+      className={cn(
+        'px-4 py-3 text-sm text-gray-800 align-middle',
+        align === 'right' && 'text-right',
+        align === 'center' && 'text-center',
+        className
+      )}
+      {...props}
+    >
+      {children}
+    </td>
+  );
+}

@@ -1,4 +1,6 @@
-export default function TableBody({ children }: { children: React.ReactNode }) {
-    return <tbody>{children}</tbody>;
+// components/shared/table/TableBody.tsx
+import { HTMLAttributes } from 'react';
+
+export default function TableBody(props: HTMLAttributes<HTMLTableSectionElement>) {
+  return <tbody {...props} />;
 }
-  

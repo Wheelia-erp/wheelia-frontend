@@ -1,7 +1,7 @@
 import Table from '@/components/shared/table/Table';
 import TableHeader from '@/components/shared/table/TableHeader';
 import TableBody from '@/components/shared/table/TableBody';
-import TableEmptyState from '@/components/shared/table/TableEmptyState';
+import TableEmptyState from '@/components/shared/table/TableEmpty';
 import CustomerRow from '@/components/customers/CustomerRow';
 import { Customer } from '@/modules/customers/customer.types';
 
