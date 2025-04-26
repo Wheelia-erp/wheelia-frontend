@@ -8,10 +8,10 @@ import {
   CreditCard,
   DollarSign,
   Settings,
-  ChevronDown,
   ChevronRight,
+  ChevronLeft,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
@@ -36,22 +36,56 @@ const navItems = [
 
 export default function Sidebar({ collapsed }: SidebarProps) {
   const pathname = usePathname();
+  const [hovering, setHovering] = useState(false);
+  const [openSection, setOpenSection] = useState<string | null>(null);
 
-  const [openSection, setOpenSection] = useState<string | null>(() => {
-    const match = navItems.find((item) =>
-      item.children?.some((child) => pathname.startsWith(child.href))
+  const isExpanded = hovering || !collapsed;
+
+  let hoverTimeout: NodeJS.Timeout;
+
+  const handleMouseEnter = () => {
+    clearTimeout(hoverTimeout);
+    setHovering(true);
+  };
+
+  const handleMouseLeave = () => {
+    hoverTimeout = setTimeout(() => setHovering(false), 200);
+  };
+
+  // Sincronizar openSection com pathname
+  useEffect(() => {
+    const match = navItems.find(item =>
+      item.children?.some(child => pathname.startsWith(child.href))
     );
-    return match?.label || null;
-  });
+    if (match) {
+      setOpenSection(match.label);
+    } else {
+      setOpenSection(null);
+    }
+  }, [pathname]);
 
   return (
-    <aside
-      className={cn(
-        'transition-all duration-300 bg-[#1E293B] text-white pt-16 shadow h-screen',
-        collapsed ? 'w-16 px-2' : 'w-60 px-4 py-6'
-      )}
+    <motion.aside
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      initial={false}
+      animate={{ width: isExpanded ? 250 : 74 }}
+      transition={{ duration: 0.2, ease: 'easeInOut' }}
+      className="fixed top-16 left-0 h-[calc(100vh-64px)] bg-[#1E293B] text-white pt-6 shadow-lg z-40 overflow-hidden"
     >
-      <nav className="space-y-2 text-sm">
+      {/* Chevron lateral */}
+      <div className="absolute right-0 top-0 h-full w-5 bg-[#0F172A] rounded-l-lg hover:bg-white/10 transition-colors duration-200 z-50">
+        <motion.button
+          whileHover={{ scale: 1.1 }}
+          className="flex items-center justify-center w-full h-full text-white hover:text-blue-300 transition"
+          onClick={() => window.dispatchEvent(new CustomEvent('toggleSidebar'))}
+        >
+          {collapsed ? <ChevronRight className="w-5 h-5" /> : <ChevronLeft className="w-5 h-5" />}
+        </motion.button>
+      </div>
+
+      {/* Navegação */}
+      <nav className="relative space-y-2 pl-1 pr-6 text-sm">
         {navItems.map(({ label, icon: Icon, href, children }) => {
           const isActive = href && pathname.startsWith(href);
           const isOpen = openSection === label;
@@ -62,15 +96,26 @@ export default function Sidebar({ collapsed }: SidebarProps) {
                 key={label}
                 href={href!}
                 className={cn(
-                  'flex items-center space-x-3 px-3 py-2 rounded-md transition',
+                  'flex items-center space-x-3 px-3 py-2 rounded-md transition-colors duration-200',
                   isActive
                     ? 'bg-white/20 text-white font-semibold'
                     : 'hover:bg-white/10 text-white/80',
-                  collapsed && 'justify-center px-2'
+                  !isExpanded && 'justify-center px-2'
                 )}
               >
-                <Icon size={18} />
-                {!collapsed && <span>{label}</span>}
+                <Icon size={20} />
+                <motion.span
+                  initial={false}
+                  animate={{ opacity: isExpanded ? 1 : 0 }}
+                  transition={{ duration: 0.2 }}
+                  className={cn(
+                    'whitespace-nowrap overflow-hidden transition-all duration-300',
+                    !isExpanded && 'w-0 opacity-0',
+                    isExpanded && 'w-auto opacity-100'
+                  )}
+                >
+                  {label}
+                </motion.span>
               </Link>
             );
           }
@@ -78,21 +123,44 @@ export default function Sidebar({ collapsed }: SidebarProps) {
           return (
             <div key={label}>
               <button
-                onClick={() => setOpenSection(isOpen ? null : label)}
+                onClick={() => {
+                  if (isExpanded) {
+                    setOpenSection(isOpen ? null : label);
+                  }
+                }}
                 className={cn(
-                  'flex items-center w-full space-x-3 px-3 py-2 rounded-md transition',
-                  (isOpen || children.some((c) => pathname.startsWith(c.href)))
+                  'flex items-center w-full space-x-3 px-3 py-2 rounded-md transition-colors duration-200',
+                  (isOpen || children.some(child => pathname.startsWith(child.href)))
                     ? 'bg-white/10 text-white font-semibold'
                     : 'hover:bg-white/10 text-white/80',
-                  collapsed && 'justify-center px-2'
+                  !isExpanded && 'justify-center px-2'
                 )}
               >
-                <Icon size={18} />
-                {!collapsed && <span className="flex-1 text-left">{label}</span>}
-                {!collapsed && (isOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />)}
+                <Icon size={20} />
+                <motion.span
+                  initial={false}
+                  animate={{ opacity: isExpanded ? 1 : 0 }}
+                  transition={{ duration: 0.2 }}
+                  className={cn(
+                    'whitespace-nowrap overflow-hidden transition-all duration-300',
+                    !isExpanded && 'w-0 opacity-0',
+                    isExpanded && 'w-auto opacity-100'
+                  )}
+                >
+                  {label}
+                </motion.span>
+                {isExpanded && (
+                  <motion.div
+                    animate={{ rotate: isOpen ? 90 : 0 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <ChevronRight size={16} />
+                  </motion.div>
+                )}
               </button>
 
-              {!collapsed && isOpen && (
+              {/* Submenu se expandido */}
+              {isExpanded && isOpen && (
                 <AnimatePresence initial={false}>
                   <motion.div
                     key="submenu"
@@ -110,10 +178,10 @@ export default function Sidebar({ collapsed }: SidebarProps) {
                             key={child.href}
                             href={child.href}
                             className={cn(
-                              'block px-3 py-1 rounded-md text-sm',
+                              'block px-3 py-1 rounded-md text-sm transition-colors duration-200',
                               isChildActive
                                 ? 'bg-white/20 text-white font-medium'
-                                : 'hover:text-white/90 text-white/70'
+                                : 'hover:bg-white/10 text-white/70'
                             )}
                           >
                             {child.label}
@@ -128,6 +196,6 @@ export default function Sidebar({ collapsed }: SidebarProps) {
           );
         })}
       </nav>
-    </aside>
+    </motion.aside>
   );
 }

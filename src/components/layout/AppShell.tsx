@@ -1,19 +1,41 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Sidebar from './Sidebar';
-import TopBar from './Topbar';
+import Topbar from './Topbar';
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return sessionStorage.getItem('sidebar-collapsed') === 'true';
+    }
+    return false;
+  });
+
+  useEffect(() => {
+    const toggle = () => {
+      setCollapsed(prev => {
+        sessionStorage.setItem('sidebar-collapsed', (!prev).toString());
+        return !prev;
+      });
+    };
+
+    window.addEventListener('toggleSidebar', toggle);
+    return () => window.removeEventListener('toggleSidebar', toggle);
+  }, []);
 
   return (
-    <div className="flex min-h-screen text-gray-900">
-      <Sidebar collapsed={sidebarCollapsed} />
-      <div className="flex-1 flex flex-col">
-      <TopBar toggleSidebar={() => setSidebarCollapsed((prev) => !prev)} collapsed={sidebarCollapsed} />
-        <main className="bg-gray-50 p-6 pt-20 min-h-[calc(100vh-64px)]">{children}</main>
-      </div>
+    <div>
+      <Topbar />
+      <Sidebar collapsed={collapsed} />
+      <main
+        className="pt-16 transition-all duration-300"
+        style={{
+          paddingLeft: collapsed ? '74px' : '250px',
+        }}
+      >
+        {children}
+      </main>
     </div>
   );
 }
