@@ -8,7 +8,15 @@ import { cn } from '@/lib/utils';
 import { RowActions } from '@/components/shared/table/RowActions';
 import { ConfirmDeleteDialog } from '@/components/shared/dialogs/ConfirmDeleteDialog';
 
-interface CustomerRowProps {
+
+
+export function CustomerRow({
+  customer,
+  onEdit,
+  onView,
+  onDelete,
+  onChangeStatus,
+}: {
   customer: Customer;
   // eslint-disable-next-line no-unused-vars
   onEdit: (customer: Customer) => void;
@@ -18,15 +26,8 @@ interface CustomerRowProps {
   onDelete: (customer: Customer) => void;
   // eslint-disable-next-line no-unused-vars
   onChangeStatus: (customer: Customer) => void;
-}
 
-export function CustomerRow({
-  customer,
-  onEdit,
-  onView,
-  onDelete,
-  onChangeStatus,
-}: CustomerRowProps) {
+}) {
   const [selected, setSelected] = useState(false);
 
   const handleClick = () => {
@@ -46,6 +47,18 @@ export function CustomerRow({
       <TableCell>{customer.document}</TableCell>
       <TableCell>{customer.phone ?? customer.mobile}</TableCell>
       <TableCell>{customer.email}</TableCell>
+      <TableCell>
+              <span
+                className={cn(
+                  'inline-block px-2 py-1 text-xs rounded-full font-medium',
+                  customer.isActive
+                    ? 'bg-green-100 text-green-800'
+                    : 'bg-red-100 text-red-700'
+                )}
+              >
+                {customer.isActive ? 'Ativo' : 'Inativo'}
+              </span>
+            </TableCell>
       <TableCell align="right">
         <RowActions>
           <button 

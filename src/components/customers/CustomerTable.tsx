@@ -7,7 +7,6 @@ import TableBody from '@/components/shared/table/TableBody';
 import TableHeader from '@/components/shared/table/TableHeader';
 import { CustomerRow } from './CustomerRow';
 import CustomerTableEmpty from './CustomerTableEmpty';
-import { PaginationToolbar } from '@/components/shared/table/PaginationToolbar';
 import TableHeaderRow from '../shared/table/TableHarderRow';
 
 interface CustomerTableProps {
@@ -50,20 +49,32 @@ export default function CustomerTable({
   onDelete,
   onChangeStatus,
 }: CustomerTableProps) {
-  return (
-    <div className="w-full overflow-x-auto bg-white border rounded-md">
-      <Table>
+  return (    
+      <Table
+            loading={loading}
+            page={page}
+            pageSize={pageSize}
+            totalItems={totalItems}
+            hasNextPage={hasNextPage}
+            hasPreviousPage={hasPreviousPage}
+            onNextPage={onNextPage}
+            onPreviousPage={onPreviousPage}
+            onPageSizeChange={onPageSizeChange}  
+            >      
         <TableHead>
           <TableHeaderRow>
             <TableHeader>Nome</TableHeader>
             <TableHeader>Documento</TableHeader>
             <TableHeader>Telefone</TableHeader>
             <TableHeader>E-mail</TableHeader>
+            <TableHeader>Status</TableHeader>
             <TableHeader align="center">Ações</TableHeader>
           </TableHeaderRow>
         </TableHead>
 
         <TableBody loading={loading} skeletonRows={5} skeletonColumns={5}>
+        {!loading && (
+          <>
           {customers.length === 0 ? (
             <CustomerTableEmpty />
           ) : (
@@ -78,20 +89,10 @@ export default function CustomerTable({
               />
             ))
           )}
+          </>
+        )}
         </TableBody>
       </Table>
 
-      {/* PaginationToolbar já acoplado no fim da tabela */}
-      <PaginationToolbar
-        page={page}
-        pageSize={pageSize}
-        totalItems={totalItems}
-        onPageChange={(newPage) => {
-          if (newPage > page) onNextPage();
-          else onPreviousPage();
-        }}
-        onPageSizeChange={onPageSizeChange}
-      />
-    </div>
   );
 }

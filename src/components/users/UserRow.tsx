@@ -30,7 +30,6 @@ export default function UserRow({
   const handleClick = () => {
     setSelected(true);
     onView(user);    
-    console.log('Visualizar usuário', user.id);
   };
 
   return (

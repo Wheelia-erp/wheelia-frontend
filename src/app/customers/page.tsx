@@ -8,8 +8,12 @@ import { useCrud } from '@/hooks/crud/useCrud';
 import { toast } from 'sonner';
 import { Customer } from '@/modules/customers/customer.types';
 import { useApiErrorToast } from '@/hooks/crud/useApiErrorToast';
+import { FilterField, FilterSheetWrapper } from '@/components/shared/forms/FilterSheetWrapper';
+import { FormButton } from '@/components/form/FormButton';
+import { useState } from 'react';
 
 export default function CustomersPage() {
+  const [filters, setFilters] = useState<Record<string, any>>({});
   const {
     items: customers,
     itemBeingEdited,
@@ -32,7 +36,7 @@ export default function CustomersPage() {
     update,
     remove,
     changeStatus,
-  } = useCrud<Customer>({ endpoint: '/customers' });
+  } = useCrud<Customer>({ endpoint: '/customers', filters });
 
   const { show: showError } = useApiErrorToast();
 
@@ -77,19 +81,36 @@ export default function CustomersPage() {
     view(customer);
   };
 
+    const filterFields: FilterField[] = [
+      { name: 'name', label: 'Nome', type: 'text' },
+      { name: 'email', label: 'Email', type: 'text' },
+      { name: 'isActive', label: 'Ativo', type: 'boolean' },      
+    ];
+
   return (
     <AppShell>
       <div className="p-6 space-y-4">
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-bold">Clientes</h1>
-          {!isFormOpen && (
-            <button
-              className="bg-blue-600 text-white px-4 py-2 rounded"
-              onClick={() => openForm()}
-            >
-              Novo Cliente
-            </button>
-          )}
+          <div className="flex gap-2">
+            {!isFormOpen && (
+              <FilterSheetWrapper
+                fields={filterFields}
+                filters={filters}
+                onChange={(newFilters) => {
+                  setFilters(newFilters);
+                  setPage(1); // Resetar para primeira página ao aplicar filtro
+                }}
+              />
+            )}
+            {!isFormOpen && (
+              <FormButton                
+                onClick={() => openForm()}
+              >
+                Novo Cliente
+              </FormButton>
+            )}
+          </div>          
         </div>
 
         {isFormOpen ? (
@@ -104,7 +125,7 @@ export default function CustomersPage() {
           />
         ) : (
           <CustomerTable
-            customers={customers}
+            customers={customers ?? []}
             loading={loading}
             page={page}
             pageSize={pageSize}
