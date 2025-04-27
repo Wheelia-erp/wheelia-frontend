@@ -16,6 +16,15 @@ export default function UsersSettingsPage() {
     isViewing,
     isFormOpen,
     loading,
+    page,
+    pageSize,
+    totalItems,
+    hasNextPage,
+    hasPreviousPage,
+    setPage,
+    setPageSize,
+    nextPage,
+    previousPage,
     openForm,
     view,
     cancelForm,    
@@ -23,10 +32,10 @@ export default function UsersSettingsPage() {
     update,
     remove,
     changeStatus,
-    reload,
   } = useCrud<User>({ endpoint: '/users' });
 
   const { show: showError } = useApiErrorToast();
+
   const handleSubmit = async (data: UserFormValues) => {
     try {
       if (itemBeingEdited) {
@@ -37,7 +46,6 @@ export default function UsersSettingsPage() {
         toast.success('Usuário criado com sucesso!');
       }
       cancelForm();
-      reload();
     } catch (err) {
       showError(err); 
     }
@@ -47,7 +55,6 @@ export default function UsersSettingsPage() {
     try {
       await remove(user.id);
       toast.success('Usuário excluído com sucesso!');
-      reload();
     } catch (err) {
       console.error(err);
       showError(err); 
@@ -59,11 +66,14 @@ export default function UsersSettingsPage() {
       const status = !user.isActive;
       await changeStatus(user.id, status);
       toast.success('Status do usuário alterado com sucesso!');
-      reload();
-    } catch(err) {
+    } catch (err) {
       showError(err); 
     }
-  }; 
+  };
+
+  const handleEdit = (user: User) => {
+    view(user);
+  };
 
   return (
     <AppShell>
@@ -91,7 +101,26 @@ export default function UsersSettingsPage() {
             loading={loading}
           />
         ) : (
-          <UserTable users={users} onEdit={openForm} onView={view} onDelete={handleDelete} onChangeStatus={handleStatusChange} />
+          <UserTable
+            users={users ?? []}
+            loading={loading}
+            page={page}
+            pageSize={pageSize}
+            totalItems={totalItems}
+            hasNextPage={hasNextPage}
+            hasPreviousPage={hasPreviousPage}
+            onNextPage={nextPage}
+            onPreviousPage={previousPage}
+            onPageSizeChange={(size) => {
+              setPageSize(size);
+              setPage(1);
+            }}
+            onEdit={handleEdit}
+            onView={view}
+            onDelete={handleDelete}
+            onChangeStatus={handleStatusChange}
+          />
+
         )}
       </div>
     </AppShell>

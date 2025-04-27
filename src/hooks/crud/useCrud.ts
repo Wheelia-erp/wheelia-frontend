@@ -1,120 +1,103 @@
-import { useEffect, useState } from 'react';
-import backendApi from '@/lib/backendApi';
+'use client';
 
-// eslint-disable-next-line no-unused-vars
-interface UseCrudOptions<T> {
+import { useEffect, useState, useCallback } from 'react';
+import backendApi from '@/lib/backendApi'; // ou onde estiver seu serviço de API
+
+interface UseCrudOptions {
   endpoint: string;
 }
 
-export function useCrud<T extends { id: string | number }>({ endpoint }: UseCrudOptions<T>) {
+export function useCrud<T>({ endpoint }: UseCrudOptions) {
   const [items, setItems] = useState<T[]>([]);
-  const [itemBeingEdited, setItemBeingEdited] = useState<T | null>(null);  
-  const [isFormOpen, setFormOpen] = useState(false);
+  const [itemBeingEdited, setItemBeingEdited] = useState<T | null>(null);
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isViewing, setIsViewing] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [isViewing, setViewing] = useState(false);
 
-  const load = async () => {
+  // 🔥 Paginação controlada internamente
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [totalItems, setTotalItems] = useState(0);
+
+  const totalPages = Math.ceil(totalItems / pageSize);
+  const hasNextPage = page < totalPages;
+  const hasPreviousPage = page > 1;
+
+  const nextPage = () => {
+    if (hasNextPage) setPage((prev) => prev + 1);
+  };
+
+  const previousPage = () => {
+    if (hasPreviousPage) setPage((prev) => prev - 1);
+  };
+
+  const reload = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await backendApi.get<T[]>(endpoint, { withCredentials: true });
-      setItems(res.data);
-    } catch (err) {
-      console.error(err);
-      setError('Erro ao carregar os dados');
+      const { data } = await backendApi.get(endpoint, {
+        params: {
+          page,
+          pageSize,
+        },
+      });
+      if (Array.isArray(data)) {
+        setItems(data);
+        setTotalItems(data.length); // Como a API não manda total, assume o próprio tamanho
+      } else {
+        setItems(data.items ?? []);
+        setTotalItems(data.total ?? 0);
+      }
     } finally {
       setLoading(false);
     }
-  };
+  }, [endpoint, page, pageSize]);
 
-  const create = async (data: Partial<T>) => {
-    try {
-      const res = await backendApi.post<T>(endpoint, data, { withCredentials: true });
-      setItems((prev) => [...prev, res.data]);
-      return res.data;
-    } catch (err: any) {
-      throw formatCrudError(err);
-    }
-  };
-
-  const update = async (id: T['id'], data: Partial<T>) => {
-    
-    try {
-    const res = await backendApi.put<T>(`${endpoint}/${id}`, data, { withCredentials: true });
-    setItems((prev) => prev.map((item) => (item.id === id ? res.data : item)));
-    } catch (err: any) {
-      throw formatCrudError(err);
-    }
-  };
-
-  const view = (item: T) => {
-    setItemBeingEdited(item);
-    setFormOpen(true);
-    setViewing(true);    
-  }; 
-
-  const changeStatus = async (id: T["id"], status: boolean) => {
-    if (status) {
-      await backendApi.put(`${endpoint}/${id}/activate`, {
-        withCredentials: true,
-      });
-    } else {
-      await backendApi.put(`${endpoint}/${id}/inactivate`, {
-        withCredentials: true,
-      });
-    }
-    setItems((prev) => prev.filter((item) => item.id !== id));
-  };
-
-  const remove = async (id: T['id']) => {
-    await backendApi.delete(`${endpoint}/${id}`, { withCredentials: true });
-    setItems((prev) => prev.filter((item) => item.id !== id));
-  };
-
-  const openForm = (item?: T) => {
-    setItemBeingEdited(item ?? null);
-    setFormOpen(true);
-    setViewing(false);
-  };
-
-  const cancelForm = () => {
-    setItemBeingEdited(null);
-    setFormOpen(false);
-    setViewing(false);
-  };
-
-  function formatCrudError(err: any): Error {
-    const status = err?.response?.status;
-    const data = err?.response?.data;
-  
-    if (status === 409) {
-      return new Error('Já existe um registro com esse dado.');
-    }
-  
-    // Se backend retornar objeto { message: "..." }
-    if (data && typeof data === 'object' && 'message' in data) {
-      return new Error((data as any).message);
-    }
-  
-    // Se backend retornar texto simples (ex: "Internal Server Error")
-    if (typeof data === 'string') {
-      if (status >= 500) {
-        return new Error('Ocorreu um erro inesperado. Tente novamente mais tarde.');
-      }
-      return new Error(data);
-    }
-  
-    // Qualquer outro erro
-    if (status >= 500) {
-      return new Error('Ocorreu um erro inesperado no servidor.');
-    }
-  
-    return new Error('Não foi possível processar sua solicitação.');
+  async function create(data: Partial<T>) {
+    await backendApi.post(endpoint, data);
+    await reload();
   }
-    
+
+  async function update(id: string, data: Partial<T>) {
+    await backendApi.put(`${endpoint}/${id}`, data);
+    await reload();
+  }
+
+  async function remove(id: string) {
+    await backendApi.delete(`${endpoint}/${id}`);
+    await reload();
+  }
+
+  async function changeStatus(id: string, isActive: boolean) {
+    await backendApi.patch(`${endpoint}/${id}/status`, { isActive });
+    await reload();
+  }
+
+  function openForm(item?: T) {
+    if (item) {
+      setItemBeingEdited(item);
+    } else {
+      setItemBeingEdited(null);
+    }
+    setIsViewing(false);
+    setIsFormOpen(true);
+  }
+
+  function view(item: T) {
+    setItemBeingEdited(item);
+    setIsViewing(true);
+    setIsFormOpen(true);
+  }
+
+  function cancelForm() {
+    setIsFormOpen(false);
+    setItemBeingEdited(null);
+    setIsViewing(false);
+  }
+
+  // 🔥 Auto reload ao mudar page ou pageSize
   useEffect(() => {
-    load();
-  }, []);
+    reload();
+  }, [reload]);
 
   return {
     items,
@@ -122,7 +105,16 @@ export function useCrud<T extends { id: string | number }>({ endpoint }: UseCrud
     isFormOpen,
     isViewing,
     loading,
-    error,
+    page,
+    pageSize,
+    totalItems,
+    totalPages,
+    hasNextPage,
+    hasPreviousPage,
+    setPage,
+    setPageSize,
+    nextPage,
+    previousPage,
     openForm,
     view,
     cancelForm,
@@ -130,6 +122,6 @@ export function useCrud<T extends { id: string | number }>({ endpoint }: UseCrud
     update,
     remove,
     changeStatus,
-    reload: load,
+    reload,
   };
 }

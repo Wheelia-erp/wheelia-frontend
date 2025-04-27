@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 import { FormInput } from './FormInput';
 
 type Props = React.ComponentProps<typeof Input> & {
-  mask: 'cnpj' | 'phone' | 'cpf';
+  mask: 'cnpj' | 'phone' | 'cpf' | 'cep';
 };
 
 export const MaskedInput = forwardRef<HTMLInputElement, Props>(
@@ -15,6 +15,12 @@ export const MaskedInput = forwardRef<HTMLInputElement, Props>(
 
     const applyMask = (raw: string) => {
       const numbers = raw.replace(/\D/g, '');
+
+      if (mask === 'cep') {
+        return numbers
+          .replace(/(\d{5})(\d)/, '$1-$2')
+          .replace(/(-\d{3})\d+?$/, '$1');        
+      }
 
       if (mask === 'cpf') {
         return numbers

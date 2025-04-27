@@ -9,8 +9,18 @@ import UserRow from './UserRow';
 import UserTableEmpty from '@/components/shared/table/TableEmpty';
 import TableHeaderRow from '../shared/table/TableHarderRow';
 
-interface Props {
+interface UserTableProps {
   users: User[];
+  loading?: boolean;
+  page: number;
+  pageSize: number;
+  totalItems: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+  onNextPage: () => void;
+  onPreviousPage: () => void;
+  // eslint-disable-next-line no-unused-vars
+  onPageSizeChange: (size: number) => void;
   // eslint-disable-next-line no-unused-vars
   onEdit: (user: User) => void;
   // eslint-disable-next-line no-unused-vars
@@ -21,24 +31,61 @@ interface Props {
   onChangeStatus: (user: User) => void;
 }
 
-export default function UserTable({ users, onEdit, onView, onDelete, onChangeStatus }: Props) {
+export default function UserTable({
+  users,
+  loading,
+  page,
+  pageSize,
+  totalItems,
+  hasNextPage,
+  hasPreviousPage,
+  onNextPage,
+  onPreviousPage,
+  onPageSizeChange,
+  onEdit,
+  onView,
+  onDelete,
+  onChangeStatus,
+}: UserTableProps) {
   return (
-    <Table>
+    <Table
+      loading={loading}
+      page={page}
+      pageSize={pageSize}
+      totalItems={totalItems}
+      hasNextPage={hasNextPage}
+      hasPreviousPage={hasPreviousPage}
+      onNextPage={onNextPage}
+      onPreviousPage={onPreviousPage}
+      onPageSizeChange={onPageSizeChange}
+    >
       <TableHead>
         <TableHeaderRow>
           <TableHeader>Nome</TableHeader>
           <TableHeader>E-mail</TableHeader>
           <TableHeader>Status</TableHeader>
-          <TableHeader align="right">Ações</TableHeader>
+          <TableHeader align="center">Ações</TableHeader>
         </TableHeaderRow>
       </TableHead>
-      <TableBody>
-        {users.length === 0 ? (
-          <UserTableEmpty />
-        ) : (
-          users.map((user) => (
-            <UserRow key={user.id} user={user} onEdit={onEdit} onDelete={onDelete} onView={onView} onChangeStatus={onChangeStatus} />
-          ))
+
+      <TableBody loading={loading} skeletonRows={5} skeletonColumns={4}>
+        {!loading && (
+          <>
+            {(users?.length ?? 0) === 0 ? (
+              <UserTableEmpty />
+            ) : (
+              users?.map((user) => (
+                <UserRow
+                  key={user.id}
+                  user={user}
+                  onEdit={onEdit}
+                  onView={onView}
+                  onDelete={onDelete}
+                  onChangeStatus={onChangeStatus}
+                />
+              ))
+            )}
+          </>
         )}
       </TableBody>
     </Table>

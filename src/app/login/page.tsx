@@ -88,7 +88,7 @@ export default function LoginPage() {
 
         <p className="mt-6 text-sm text-gray-600 text-center">
           Ainda não tem conta?{' '}
-          <a href="#" className="text-blue-600 hover:underline">
+          <a href="/signup" className="text-blue-600 hover:underline">
             Crie uma agora
           </a>
         </p>
