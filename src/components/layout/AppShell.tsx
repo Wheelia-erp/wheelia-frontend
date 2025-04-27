@@ -3,16 +3,22 @@
 import { useEffect, useState } from 'react';
 import Sidebar from './Sidebar';
 import Topbar from './Topbar';
+import { useHydrated } from '@/hooks/useHydrated';
 
-export default function AppShell({ children }: { children: React.ReactNode }) {
-  const [collapsed, setCollapsed] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return sessionStorage.getItem('sidebar-collapsed') === 'true';
-    }
-    return false;
-  });
+interface AppShellProps {
+  children: React.ReactNode;
+}
+
+export default function AppShell({ children }: AppShellProps) {
+  const hydrated = useHydrated();
+  const [collapsed, setCollapsed] = useState(false);
 
   useEffect(() => {
+    if (!hydrated) return;
+
+    const initialCollapsed = sessionStorage.getItem('sidebar-collapsed') === 'true';
+    setCollapsed(initialCollapsed);
+
     const toggle = () => {
       setCollapsed(prev => {
         sessionStorage.setItem('sidebar-collapsed', (!prev).toString());
@@ -22,7 +28,11 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
     window.addEventListener('toggleSidebar', toggle);
     return () => window.removeEventListener('toggleSidebar', toggle);
-  }, []);
+  }, [hydrated]);
+
+  if (!hydrated) {
+    return null;
+  }
 
   return (
     <div>

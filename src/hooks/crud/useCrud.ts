@@ -1,85 +1,82 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
-import backendApi from '@/lib/backendApi'; // ou onde estiver seu serviço de API
+import backendApi from '@/lib/backendApi';
+import { useEffect, useState } from 'react';
+
 
 interface UseCrudOptions {
   endpoint: string;
+  filters?: Record<string, any>;
 }
 
-export function useCrud<T>({ endpoint }: UseCrudOptions) {
+export function useCrud<T>({ endpoint, filters = {} }: UseCrudOptions) {
   const [items, setItems] = useState<T[]>([]);
+  const [loading, setLoading] = useState(false);
+
   const [itemBeingEdited, setItemBeingEdited] = useState<T | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isViewing, setIsViewing] = useState(false);
-  const [loading, setLoading] = useState(false);
 
-  // 🔥 Paginação controlada internamente
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [totalItems, setTotalItems] = useState(0);
 
-  const totalPages = Math.ceil(totalItems / pageSize);
-  const hasNextPage = page < totalPages;
+  const hasNextPage = page * pageSize < totalItems;
   const hasPreviousPage = page > 1;
 
-  const nextPage = () => {
-    if (hasNextPage) setPage((prev) => prev + 1);
-  };
-
-  const previousPage = () => {
-    if (hasPreviousPage) setPage((prev) => prev - 1);
-  };
-
-  const reload = useCallback(async () => {
-    setLoading(true);
+  async function fetchData() {
     try {
-      const { data } = await backendApi.get(endpoint, {
-        params: {
-          page,
-          pageSize,
-        },
+      setLoading(true);
+
+      const params = new URLSearchParams();
+      params.set('page', page.toString());
+      params.set('pageSize', pageSize.toString());
+
+      // 🔥 Inclui os filtros na querystring
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value !== undefined && value !== '') {
+          if (typeof value === 'object' && !Array.isArray(value)) {
+            Object.entries(value).forEach(([subKey, subValue]) => {
+              params.set(`${key}[${subKey}]`, String(subValue));
+            });
+          } else {
+            params.set(key, String(value));
+          }
+        }
       });
-      if (Array.isArray(data)) {
-        setItems(data);
-        setTotalItems(data.length); // Como a API não manda total, assume o próprio tamanho
-      } else {
-        setItems(data.items ?? []);
-        setTotalItems(data.total ?? 0);
-      }
+
+      const response = await backendApi.get<{ items: T[]; total: number }>(
+        `${endpoint}?${params.toString()}`
+      );
+
+      setItems(response.data.items);
+      setTotalItems(response.data.total);
     } finally {
       setLoading(false);
     }
-  }, [endpoint, page, pageSize]);
-
-  async function create(data: Partial<T>) {
-    await backendApi.post(endpoint, data);
-    await reload();
   }
 
-  async function update(id: string, data: Partial<T>) {
-    await backendApi.put(`${endpoint}/${id}`, data);
-    await reload();
+  useEffect(() => {
+    fetchData();
+  }, [endpoint, page, pageSize, filters]); // 🔥 Agora escuta filters também!
+
+  function onNextPage() {
+    if (hasNextPage) setPage((prev) => prev + 1);
   }
 
-  async function remove(id: string) {
-    await backendApi.delete(`${endpoint}/${id}`);
-    await reload();
+  function onPreviousPage() {
+    if (hasPreviousPage) setPage((prev) => prev - 1);
   }
 
-  async function changeStatus(id: string, isActive: boolean) {
-    await backendApi.patch(`${endpoint}/${id}/status`, { isActive });
-    await reload();
+  function onPageSizeChange(size: number) {
+    setPageSize(size);
+    setPage(1);
   }
 
-  function openForm(item?: T) {
-    if (item) {
-      setItemBeingEdited(item);
-    } else {
-      setItemBeingEdited(null);
-    }
-    setIsViewing(false);
+  function openForm() {
     setIsFormOpen(true);
+    setIsViewing(false);
+    setItemBeingEdited(null);
   }
 
   function view(item: T) {
@@ -90,31 +87,49 @@ export function useCrud<T>({ endpoint }: UseCrudOptions) {
 
   function cancelForm() {
     setIsFormOpen(false);
-    setItemBeingEdited(null);
     setIsViewing(false);
+    setItemBeingEdited(null);
   }
 
-  // 🔥 Auto reload ao mudar page ou pageSize
-  useEffect(() => {
-    reload();
-  }, [reload]);
+  async function create(payload: Partial<T>) {
+    const response = await backendApi.post<T>(endpoint, payload);
+    cancelForm();
+    fetchData();
+    return response.data;
+  }
+
+  async function update(id: string, payload: Partial<T>) {
+    const response = await backendApi.put<T>(`${endpoint}/${id}`, payload);
+    cancelForm();
+    fetchData();
+    return response.data;
+  }
+
+  async function remove(id: string) {
+    await backendApi.delete(`${endpoint}/${id}`);
+    fetchData();
+  }
+
+  async function changeStatus(id: string, statusField: keyof T = 'isActive' as keyof T) {
+    const item = items.find((i) => (i as any).id === id);
+    if (!item) return;
+
+    const updated = { [statusField]: !(item as any)[statusField] };
+    await backendApi.patch(`${endpoint}/${id}`, updated);
+    fetchData();
+  }
 
   return {
     items,
     itemBeingEdited,
-    isFormOpen,
     isViewing,
+    isFormOpen,
     loading,
     page,
     pageSize,
     totalItems,
-    totalPages,
     hasNextPage,
     hasPreviousPage,
-    setPage,
-    setPageSize,
-    nextPage,
-    previousPage,
     openForm,
     view,
     cancelForm,
@@ -122,6 +137,10 @@ export function useCrud<T>({ endpoint }: UseCrudOptions) {
     update,
     remove,
     changeStatus,
-    reload,
+    onNextPage,
+    onPreviousPage,
+    onPageSizeChange,
+    setPage,
+    setPageSize,
   };
 }

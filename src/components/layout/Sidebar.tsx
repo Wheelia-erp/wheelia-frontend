@@ -34,7 +34,8 @@ const navItems = [
   },
 ];
 
-export default function Sidebar({ collapsed }: SidebarProps) {
+export default function Sidebar({ collapsed }: SidebarProps) {  
+
   const pathname = usePathname();
   const [hovering, setHovering] = useState(false);
   const [openSection, setOpenSection] = useState<string | null>(null);

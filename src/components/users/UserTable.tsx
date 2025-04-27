@@ -62,19 +62,20 @@ export default function UserTable({
       <TableHead>
         <TableHeaderRow>
           <TableHeader>Nome</TableHeader>
-          <TableHeader>E-mail</TableHeader>
+          <TableHeader>Email</TableHeader>
+          <TableHeader>Perfil</TableHeader>
           <TableHeader>Status</TableHeader>
           <TableHeader align="center">Ações</TableHeader>
         </TableHeaderRow>
       </TableHead>
 
-      <TableBody loading={loading} skeletonRows={5} skeletonColumns={4}>
+      <TableBody loading={loading} skeletonRows={5} skeletonColumns={5}>
         {!loading && (
           <>
             {(users?.length ?? 0) === 0 ? (
               <UserTableEmpty />
             ) : (
-              users?.map((user) => (
+              users.map((user) => (
                 <UserRow
                   key={user.id}
                   user={user}

@@ -43,6 +43,7 @@ export default function UserRow({
     >
       <TableCell>{user.name}</TableCell>
       <TableCell>{user.email}</TableCell>
+      <TableCell>{user.role}</TableCell>
       <TableCell>
         <span
           className={cn(

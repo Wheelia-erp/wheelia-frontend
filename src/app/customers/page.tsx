@@ -23,8 +23,8 @@ export default function CustomersPage() {
     hasPreviousPage,
     setPage,
     setPageSize,
-    nextPage,
-    previousPage,
+    onNextPage,
+    onPreviousPage,
     openForm,
     view,
     cancelForm,
@@ -39,6 +39,7 @@ export default function CustomersPage() {
   const handleSubmit = async (data: CustomerFormValues) => {
     try {
       if (itemBeingEdited) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         await update((itemBeingEdited as any).id, data);
         toast.success('Cliente atualizado com sucesso!');
       } else {
@@ -53,6 +54,7 @@ export default function CustomersPage() {
 
   const handleDelete = async (customer: Customer) => {
     try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await remove((customer as any).id);
       toast.success('Cliente excluído com sucesso!');
     } catch (err) {
@@ -62,8 +64,9 @@ export default function CustomersPage() {
 
   const handleStatusChange = async (customer: Customer) => {
     try {
-      const status = !customer.isActive;
-      await changeStatus((customer as any).id, status);
+      
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await changeStatus((customer as any).id, 'isActive');
       toast.success('Status do cliente alterado com sucesso!');
     } catch (err) {
       showError(err);
@@ -108,8 +111,8 @@ export default function CustomersPage() {
             totalItems={totalItems}
             hasNextPage={hasNextPage}
             hasPreviousPage={hasPreviousPage}
-            onNextPage={nextPage}
-            onPreviousPage={previousPage}
+            onNextPage={onNextPage}
+            onPreviousPage={onPreviousPage}
             onPageSizeChange={(size) => {
               setPageSize(size);
               setPage(1);

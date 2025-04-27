@@ -9,7 +9,13 @@ import { toast } from 'sonner';
 import { User } from '@/modules/users/user.types';
 import { useApiErrorToast } from '@/hooks/crud/useApiErrorToast';
 
+import { useState } from 'react';
+import { FilterField, FilterSheetWrapper } from '@/components/shared/forms/FilterSheetWrapper';
+import { FormButton } from '@/components/form/FormButton';
+
 export default function UsersSettingsPage() {
+  const [filters, setFilters] = useState<Record<string, any>>({});
+
   const {
     items: users,
     itemBeingEdited,
@@ -23,8 +29,8 @@ export default function UsersSettingsPage() {
     hasPreviousPage,
     setPage,
     setPageSize,
-    nextPage,
-    previousPage,
+    onNextPage,
+    onPreviousPage,
     openForm,
     view,
     cancelForm,    
@@ -32,7 +38,7 @@ export default function UsersSettingsPage() {
     update,
     remove,
     changeStatus,
-  } = useCrud<User>({ endpoint: '/users' });
+  } = useCrud<User>({ endpoint: '/users', filters });
 
   const { show: showError } = useApiErrorToast();
 
@@ -62,9 +68,8 @@ export default function UsersSettingsPage() {
   };  
 
   const handleStatusChange = async (user: User) => {
-    try {
-      const status = !user.isActive;
-      await changeStatus(user.id, status);
+    try {      
+      await changeStatus(user.id, 'isActive');
       toast.success('Status do usuário alterado com sucesso!');
     } catch (err) {
       showError(err); 
@@ -75,19 +80,37 @@ export default function UsersSettingsPage() {
     view(user);
   };
 
+  const filterFields: FilterField[] = [
+    { name: 'name', label: 'Nome', type: 'text' },
+    { name: 'email', label: 'Email', type: 'text' },
+    { name: 'isActive', label: 'Ativo', type: 'boolean' },
+    { name: 'role', label: 'Perfil', type: 'text' },
+  ];
+
   return (
     <AppShell>
       <div className="p-6 space-y-4">
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-bold">Usuários</h1>
-          {!isFormOpen && (
-            <button
-              className="bg-blue-600 text-white px-4 py-2 rounded"
-              onClick={() => openForm()}
-            >
-              Novo Usuário
-            </button>
-          )}
+          <div className="flex gap-2">
+            {!isFormOpen && (
+              <FilterSheetWrapper
+                fields={filterFields}
+                filters={filters}
+                onChange={(newFilters) => {
+                  setFilters(newFilters);
+                  setPage(1); // Resetar para primeira página ao aplicar filtro
+                }}
+              />
+            )}
+            {!isFormOpen && (
+              <FormButton                
+                onClick={() => openForm()}
+              >
+                Novo Usuário
+              </FormButton>
+            )}
+          </div>
         </div>
 
         {isFormOpen ? (
@@ -109,8 +132,8 @@ export default function UsersSettingsPage() {
             totalItems={totalItems}
             hasNextPage={hasNextPage}
             hasPreviousPage={hasPreviousPage}
-            onNextPage={nextPage}
-            onPreviousPage={previousPage}
+            onNextPage={onNextPage}
+            onPreviousPage={onPreviousPage}
             onPageSizeChange={(size) => {
               setPageSize(size);
               setPage(1);
@@ -120,7 +143,6 @@ export default function UsersSettingsPage() {
             onDelete={handleDelete}
             onChangeStatus={handleStatusChange}
           />
-
         )}
       </div>
     </AppShell>
