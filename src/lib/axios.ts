@@ -47,7 +47,7 @@ const api = axios.create({
 
         setTimeout(() => {
             window.location.href = '/login';
-        }, 300000);
+        }, 300);
         }
 
         return Promise.reject(error);
