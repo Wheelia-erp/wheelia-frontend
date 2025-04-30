@@ -1,7 +1,7 @@
+import { CustomerEntity } from '@/app/customers/entity/customer.entity';
 import { Validator } from 'fluentvalidation-ts';
-import { CustomerFormValues } from '@/components/customers/CustomerForm';
 
-export class CustomerFormValidator extends Validator<CustomerFormValues> {
+export class CustomerFormValidator extends Validator<CustomerEntity> {
   constructor() {
     super();
 
@@ -17,16 +17,22 @@ export class CustomerFormValidator extends Validator<CustomerFormValues> {
       .notEmpty()
       .withMessage('Nome é obrigatório.');
 
-    this.ruleFor('email')
+    this.ruleFor('email')    
       .must(email => !email || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
       .withMessage('E-mail inválido.');
-
-    this.ruleFor('birthOrOpeningDate')
-      .must(date => !date || /^\d{4}-\d{2}-\d{2}$/.test(date))
+/*
+    this.ruleFor('birthDate')
+      .must(value => !!value && value !== '')
+      //.must(date => !date || /^\d{4}-\d{2}-\d{2}$/.test(date))
       .withMessage('Data inválida.');
 
+    this.ruleFor('openingDate')
+      .must(value => !!value && value !== '')
+      //.must(date => !date || /^\d{4}-\d{2}-\d{2}$/.test(date))
+      .withMessage('Data inválida.');
+      
     this.ruleFor('zipCode')
       .must(zip => !zip || /^\d{5}-?\d{3}$/.test(zip))
-      .withMessage('CEP inválido.');
+      .withMessage('CEP inválido.');*/
   }
 }

@@ -3,23 +3,23 @@
 import AppShell from '@/components/layout/AppShell';
 import UserTable from '@/components/users/UserTable';
 import { UserFormWrapper } from '@/components/users/UserFormWrapper';
-import { UserFormValues } from '@/components/users/UserForm';
-import { useCrud } from '@/hooks/crud/useCrud';
+import { FilterValue, useCrud } from '@/hooks/crud/useCrud';
 import { toast } from 'sonner';
-import { User } from '@/modules/users/user.types';
 import { useApiErrorToast } from '@/hooks/crud/useApiErrorToast';
-
 import { useState } from 'react';
 import { FilterField, FilterSheetWrapper } from '@/components/shared/forms/FilterSheetWrapper';
 import { FormButton } from '@/components/form/FormButton';
+import { UserEntity } from './entity/user.entity';
+import { UserFormDto } from './dto/user-form.dto';
 
 export default function UsersSettingsPage() {
-  const [filters, setFilters] = useState<Record<string, any>>({});
+  const [filters, setFilters] = useState<Record<string, FilterValue>>({});
 
   const {
     items: users,
     itemBeingEdited,
     isViewing,
+    isEditing,
     isFormOpen,
     loading,
     page,
@@ -32,32 +32,35 @@ export default function UsersSettingsPage() {
     onNextPage,
     onPreviousPage,
     openForm,
-    view,
+    onView,
+    onEdit,
     cancelForm,    
     create,
     update,
     remove,
-    changeStatus,
-  } = useCrud<User>({ endpoint: '/users', filters });
+    changeStatus,    
+  } = useCrud<UserEntity, UserFormDto>({ endpoint: '/users', filters });
 
   const { show: showError } = useApiErrorToast();
 
-  const handleSubmit = async (data: UserFormValues) => {
+  const handleSubmit = async (data: UserEntity) => {    
+    const dataToSave = new UserFormDto(data);
+    if (itemBeingEdited)
     try {
       if (itemBeingEdited) {
-        await update(itemBeingEdited.id, data);
+        await update(itemBeingEdited.id, dataToSave);
         toast.success('Usuário atualizado com sucesso!');
       } else {
-        await create(data);
+        await create(dataToSave);
         toast.success('Usuário criado com sucesso!');
       }
       cancelForm();
     } catch (err) {
       showError(err); 
-    }
+    }    
   };
 
-  const handleDelete = async (user: User) => {
+  const handleDelete = async (user: UserEntity) => {
     try {
       await remove(user.id);
       toast.success('Usuário excluído com sucesso!');
@@ -67,17 +70,13 @@ export default function UsersSettingsPage() {
     }
   };  
 
-  const handleStatusChange = async (user: User) => {
+  const handleStatusChange = async (user: UserEntity) => {
     try {      
-      await changeStatus(user.id, 'isActive');
+      await changeStatus(user.id);
       toast.success('Status do usuário alterado com sucesso!');
     } catch (err) {
       showError(err); 
     }
-  };
-
-  const handleEdit = (user: User) => {
-    view(user);
   };
 
   const filterFields: FilterField[] = [
@@ -99,14 +98,12 @@ export default function UsersSettingsPage() {
                 filters={filters}
                 onChange={(newFilters) => {
                   setFilters(newFilters);
-                  setPage(1); // Resetar para primeira página ao aplicar filtro
+                  setPage(1); 
                 }}
               />
             )}
             {!isFormOpen && (
-              <FormButton                
-                onClick={() => openForm()}
-              >
+              <FormButton onClick={() => openForm()}>
                 Novo Usuário
               </FormButton>
             )}
@@ -115,9 +112,9 @@ export default function UsersSettingsPage() {
 
         {isFormOpen ? (
           <UserFormWrapper
-            title={itemBeingEdited ? 'Editar Usuário' : 'Novo Usuário'}
+            title='Usuário'
             defaultValues={itemBeingEdited ?? undefined}
-            isEditing={!!isViewing && !!itemBeingEdited}
+            isEditing={isEditing}
             readOnly={isViewing}
             onSubmit={handleSubmit}
             onCancel={cancelForm}            
@@ -138,8 +135,8 @@ export default function UsersSettingsPage() {
               setPageSize(size);
               setPage(1);
             }}
-            onEdit={handleEdit}
-            onView={view}
+            onEdit={onEdit}
+            onView={onView}
             onDelete={handleDelete}
             onChangeStatus={handleStatusChange}
           />

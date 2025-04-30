@@ -3,10 +3,10 @@
 import { useState } from 'react';
 import TableRow from '@/components/shared/table/TableRow';
 import TableCell from '@/components/shared/table/TableCell';
-import { User } from '@/modules/users/user.types';
 import { cn } from '@/lib/utils';
 import { RowActions } from '../shared/table/RowActions';
 import { ConfirmDeleteDialog } from '@/components/shared/dialogs/ConfirmDeleteDialog';
+import { UserEntity } from '@/app/settings/users/entity/user.entity';
 
 export default function UserRow({   
   user,
@@ -15,15 +15,15 @@ export default function UserRow({
   onDelete,
   onChangeStatus, 
 }: { 
-  user: User,
+  user: UserEntity,
   // eslint-disable-next-line no-unused-vars
-  onEdit: (user: User) => void, 
+  onEdit: (user: UserEntity) => void, 
   // eslint-disable-next-line no-unused-vars
-  onView: (user: User) => void,
+  onView: (user: UserEntity) => void,
   // eslint-disable-next-line no-unused-vars
-  onDelete: (user: User) => void,
+  onDelete: (user: UserEntity) => void,
   // eslint-disable-next-line no-unused-vars
-  onChangeStatus: (user: User) => void,
+  onChangeStatus: (user: UserEntity) => void,
 }) {
   const [selected, setSelected] = useState(false);
 

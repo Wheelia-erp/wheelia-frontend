@@ -1,6 +1,5 @@
 'use client';
 
-import { User } from '@/modules/users/user.types';
 import Table from '@/components/shared/table/Table';
 import TableHead from '@/components/shared/table/TableHead';
 import TableBody from '@/components/shared/table/TableBody';
@@ -8,9 +7,10 @@ import TableHeader from '@/components/shared/table/TableHeader';
 import UserRow from './UserRow';
 import UserTableEmpty from '@/components/shared/table/TableEmpty';
 import TableHeaderRow from '../shared/table/TableHarderRow';
+import { UserEntity } from '@/app/settings/users/entity/user.entity';
 
 interface UserTableProps {
-  users: User[];
+  users: UserEntity[];
   loading?: boolean;
   page: number;
   pageSize: number;
@@ -22,13 +22,13 @@ interface UserTableProps {
   // eslint-disable-next-line no-unused-vars
   onPageSizeChange: (size: number) => void;
   // eslint-disable-next-line no-unused-vars
-  onEdit: (user: User) => void;
+  onEdit: (user: UserEntity) => void;
   // eslint-disable-next-line no-unused-vars
-  onView: (user: User) => void;
+  onView: (user: UserEntity) => void;
   // eslint-disable-next-line no-unused-vars
-  onDelete: (user: User) => void;
+  onDelete: (user: UserEntity) => void;
   // eslint-disable-next-line no-unused-vars
-  onChangeStatus: (user: User) => void;
+  onChangeStatus: (user: UserEntity) => void;
 }
 
 export default function UserTable({

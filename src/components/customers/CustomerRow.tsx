@@ -1,14 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { Customer } from '@/modules/customers/customer.types';
 import TableRow from '@/components/shared/table/TableRow';
 import TableCell from '@/components/shared/table/TableCell';
 import { cn } from '@/lib/utils';
 import { RowActions } from '@/components/shared/table/RowActions';
 import { ConfirmDeleteDialog } from '@/components/shared/dialogs/ConfirmDeleteDialog';
-
-
+import { CustomerEntity } from '@/app/customers/entity/customer.entity';
 
 export function CustomerRow({
   customer,
@@ -17,15 +15,15 @@ export function CustomerRow({
   onDelete,
   onChangeStatus,
 }: {
-  customer: Customer;
+  customer: CustomerEntity;
   // eslint-disable-next-line no-unused-vars
-  onEdit: (customer: Customer) => void;
+  onEdit: (customer: CustomerEntity) => void;
   // eslint-disable-next-line no-unused-vars
-  onView: (customer: Customer) => void;
+  onView: (customer: CustomerEntity) => void;
   // eslint-disable-next-line no-unused-vars
-  onDelete: (customer: Customer) => void;
+  onDelete: (customer: CustomerEntity) => void;
   // eslint-disable-next-line no-unused-vars
-  onChangeStatus: (customer: Customer) => void;
+  onChangeStatus: (customer: CustomerEntity) => void;
 
 }) {
   const [selected, setSelected] = useState(false);

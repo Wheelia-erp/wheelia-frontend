@@ -3,21 +3,22 @@
 import AppShell from '@/components/layout/AppShell';
 import CustomerTable from '@/components/customers/CustomerTable';
 import { CustomerFormWrapper } from '@/components/customers/CustomerFormWrapper';
-import { CustomerFormValues } from '@/components/customers/CustomerForm';
-import { useCrud } from '@/hooks/crud/useCrud';
+import { FilterValue, useCrud } from '@/hooks/crud/useCrud';
 import { toast } from 'sonner';
-import { Customer } from '@/modules/customers/customer.types';
 import { useApiErrorToast } from '@/hooks/crud/useApiErrorToast';
 import { FilterField, FilterSheetWrapper } from '@/components/shared/forms/FilterSheetWrapper';
 import { FormButton } from '@/components/form/FormButton';
 import { useState } from 'react';
+import { CustomerEntity } from './entity/customer.entity';
+import { CustomerFormDto } from './dto/customer-form.dto';
 
 export default function CustomersPage() {
-  const [filters, setFilters] = useState<Record<string, any>>({});
+  const [filters, setFilters] = useState<Record<string, FilterValue>>({});
   const {
     items: customers,
     itemBeingEdited,
-    isViewing,
+    isViewing,   
+    isEditing, 
     isFormOpen,
     loading,
     page,
@@ -29,25 +30,29 @@ export default function CustomersPage() {
     setPageSize,
     onNextPage,
     onPreviousPage,
-    openForm,
-    view,
+    openForm,    
     cancelForm,
+    onView, 
+    onEdit,   
     create,
     update,
     remove,
     changeStatus,
-  } = useCrud<Customer>({ endpoint: '/customers', filters });
+  } = useCrud<CustomerEntity, CustomerFormDto>({
+    endpoint: "/customers",
+    filters,
+  });
 
   const { show: showError } = useApiErrorToast();
 
-  const handleSubmit = async (data: CustomerFormValues) => {
+  const handleSubmit = async (data: CustomerEntity) => {        
     try {
-      if (itemBeingEdited) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        await update((itemBeingEdited as any).id, data);
+      const dataToSave = new CustomerFormDto(data);       
+      if (itemBeingEdited) {        
+        await update(itemBeingEdited.id, dataToSave);
         toast.success('Cliente atualizado com sucesso!');
       } else {
-        await create(data);
+        await create(dataToSave);
         toast.success('Cliente criado com sucesso!');
       }
       cancelForm();
@@ -56,36 +61,28 @@ export default function CustomersPage() {
     }
   };
 
-  const handleDelete = async (customer: Customer) => {
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await remove((customer as any).id);
+  const handleDelete = async (customer: CustomerEntity) => {
+    try {      
+      await remove(customer.id);
       toast.success('Cliente excluído com sucesso!');
     } catch (err) {
       showError(err);
     }
   };
 
-  const handleStatusChange = async (customer: Customer) => {
-    try {
-      
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await changeStatus((customer as any).id, 'isActive');
+  const handleStatusChange = async (customer: CustomerEntity) => {
+    try {         
+      await changeStatus(customer.id);
       toast.success('Status do cliente alterado com sucesso!');
     } catch (err) {
       showError(err);
     }
   };
-
-  const handleEdit = (customer: Customer) => {
-    view(customer);
-  };
-
-    const filterFields: FilterField[] = [
-      { name: 'name', label: 'Nome', type: 'text' },
-      { name: 'email', label: 'Email', type: 'text' },
-      { name: 'isActive', label: 'Ativo', type: 'boolean' },      
-    ];
+  const filterFields: FilterField[] = [
+    { name: 'name', label: 'Nome', type: 'text' },
+    { name: 'email', label: 'Email', type: 'text' },
+    { name: 'isActive', label: 'Ativo', type: 'boolean' },      
+  ];
 
   return (
     <AppShell>
@@ -99,14 +96,12 @@ export default function CustomersPage() {
                 filters={filters}
                 onChange={(newFilters) => {
                   setFilters(newFilters);
-                  setPage(1); // Resetar para primeira página ao aplicar filtro
+                  setPage(1); 
                 }}
               />
             )}
             {!isFormOpen && (
-              <FormButton                
-                onClick={() => openForm()}
-              >
+              <FormButton onClick={() => openForm()}>
                 Novo Cliente
               </FormButton>
             )}
@@ -115,9 +110,9 @@ export default function CustomersPage() {
 
         {isFormOpen ? (
           <CustomerFormWrapper
-            title={itemBeingEdited ? 'Editar Cliente' : 'Novo Cliente'}
+            title='Cliente'
             defaultValues={itemBeingEdited ?? undefined}
-            isEditing={!!isViewing && !!itemBeingEdited}
+            isEditing={isEditing}
             readOnly={isViewing}
             onSubmit={handleSubmit}
             onCancel={cancelForm}
@@ -138,8 +133,8 @@ export default function CustomersPage() {
               setPageSize(size);
               setPage(1);
             }}
-            onEdit={handleEdit}
-            onView={view}
+            onEdit={onEdit}
+            onView={onView}
             onDelete={handleDelete}
             onChangeStatus={handleStatusChange}
           />

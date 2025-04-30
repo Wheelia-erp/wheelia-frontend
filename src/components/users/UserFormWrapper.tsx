@@ -1,16 +1,25 @@
 // UserFormWrapper.tsx
 'use client';
 
-import { UserForm, UserFormValues } from './UserForm';
+import { useForm } from 'react-hook-form';
+import { FormButton } from '../form/FormButton';
+import { FormCancelButton } from '../form/FormCancelButton';
+import { FormPageTemplate } from '../form/FormPageTemplate';
+import { UserForm } from './UserForm';
+import { UserEntity } from '@/app/settings/users/entity/user.entity';
+import { UserFormValidator } from '@/components/users/validators/UserFormValidator';
+import { fluentResolver } from '@/lib/fluent-resolver';
+import { UserSummary } from './UserSummary';
 
 interface Props {
   title: string;
-  defaultValues?: Partial<UserFormValues>;
+  defaultValues?: Partial<UserEntity>;
   // eslint-disable-next-line no-unused-vars
-  onSubmit: (data: UserFormValues) => Promise<void>;
+  onSubmit: (data: UserEntity) => Promise<void>;
   onCancel: () => void;
   loading: boolean;
   isEditing?: boolean;
+  isViewing?: boolean;
   readOnly?: boolean;
 }
 
@@ -20,25 +29,53 @@ export function UserFormWrapper({
   onSubmit,
   onCancel,
   loading,
-  isEditing = false,
-  readOnly: isReadOnly = true,
+  isViewing,
+  isEditing,
+  readOnly,
 }: Props) {
+  const form = useForm<UserEntity>({
+    resolver: fluentResolver<UserEntity>(new UserFormValidator()),
+    defaultValues: {
+      ...defaultValues,
+    },
+  });
+
   return (
-    <div className="bg-white shadow rounded p-4">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-lg font-semibold">{title}</h2>        
-            <button className="text-gray-500 hover:text-gray-700" onClick={onCancel}>
-                {isReadOnly ? 'Fechar' : 'Cancelar'}            
-            </button>        
-      </div>
-      <UserForm
-        defaultValues={defaultValues}
-        onSubmit={onSubmit}
-        onCancel={onCancel}
-        loading={loading}
-        isEditing={isEditing}
-        isReadOnly={isReadOnly}
-      />
-    </div>
+    <FormPageTemplate
+      title={title}
+      isViewing={isViewing}
+      isEditing={isEditing}
+      readOnly={readOnly}
+      loading={loading}
+      onSubmit={form.handleSubmit(onSubmit)}
+      breadcrumbItems={[
+        { label: "Usuários", href: "/settings/users" },
+        { label: title },
+      ]}
+      actions={
+        <>
+          <FormCancelButton type="button" onClick={onCancel}>
+            {readOnly ? "Voltar" : "Cancelar"}
+          </FormCancelButton>
+          {!readOnly && (
+            <FormButton type="submit" disabled={loading}>
+              {isEditing ? "Salvar Alterações" : "Cadastrar Cliente"}
+            </FormButton>
+          )}
+        </>
+      }
+    >
+      {readOnly ? (
+        <UserSummary data={defaultValues as UserEntity} />
+      ) : (
+        <UserForm
+          defaultValues={defaultValues}
+          onCancel={onCancel}
+          loading={loading}
+          isEditing={isEditing}
+          isReadOnly={readOnly}
+        />
+      )}
+    </FormPageTemplate>
   );
 }

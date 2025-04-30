@@ -1,28 +1,36 @@
 'use client';
 
+import { BaseFormDto } from '@/core/dto/base-form.dto';
+import { BaseEntity } from '@/core/entity/base.entity';
 import backendApi from '@/lib/backendApi';
 import { useEffect, useState } from 'react';
+import { Primitive } from 'react-hook-form';
 
+export type FilterValue = Primitive | Record<string, Primitive> | Array<Primitive | Record<string, Primitive>>;
+
+// eslint-disable-next-line no-unused-vars, @typescript-eslint/no-explicit-any
+type Constructor<T> = new (...args: any[]) => T;
 
 interface UseCrudOptions {
   endpoint: string;
-  filters?: Record<string, any>;
+  filters?: Record<string, FilterValue>;    
 }
 
-export function useCrud<T>({ endpoint, filters = {} }: UseCrudOptions) {
-  const [items, setItems] = useState<T[]>([]);
+export function useCrud<EntityType extends BaseEntity, FormDtoType extends BaseFormDto>({ endpoint, filters = {} }: UseCrudOptions) {
+  const [items, setItems] = useState<EntityType[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const [itemBeingEdited, setItemBeingEdited] = useState<T | null>(null);
+  const [itemBeingEdited, setItemBeingEdited] = useState<EntityType | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isViewing, setIsViewing] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
 
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [totalItems, setTotalItems] = useState(0);
 
   const hasNextPage = page * pageSize < totalItems;
-  const hasPreviousPage = page > 1;
+  const hasPreviousPage = page > 1;  
 
   async function fetchData() {
     try {
@@ -31,13 +39,12 @@ export function useCrud<T>({ endpoint, filters = {} }: UseCrudOptions) {
       const params = new URLSearchParams();
       params.set('page', page.toString());
       params.set('pageSize', pageSize.toString());
-
-      // 🔥 Inclui os filtros na querystring
+      
       Object.entries(filters).forEach(([key, value]) => {
         if (value !== undefined && value !== '') {
-          if (typeof value === 'object' && !Array.isArray(value)) {
-            Object.entries(value).forEach(([subKey, subValue]) => {
-              params.set(`${key}[${subKey}]`, String(subValue));
+          if (typeof value === 'object' && !Array.isArray(value) && value !== null) {
+            Object.entries(value).forEach(([op, opValue]) => {
+              params.set(`${key}[${op}]`, String(opValue));
             });
           } else {
             params.set(key, String(value));
@@ -45,7 +52,7 @@ export function useCrud<T>({ endpoint, filters = {} }: UseCrudOptions) {
         }
       });
 
-      const response = await backendApi.get<{ items: T[]; total: number }>(
+      const response = await backendApi.get<{ items: EntityType[]; total: number }>(
         `${endpoint}?${params.toString()}`
       );
 
@@ -58,7 +65,7 @@ export function useCrud<T>({ endpoint, filters = {} }: UseCrudOptions) {
 
   useEffect(() => {
     fetchData();
-  }, [endpoint, page, pageSize, filters]); // 🔥 Agora escuta filters também!
+  }, [endpoint, page, pageSize, filters]); 
 
   function onNextPage() {
     if (hasNextPage) setPage((prev) => prev + 1);
@@ -76,10 +83,18 @@ export function useCrud<T>({ endpoint, filters = {} }: UseCrudOptions) {
   function openForm() {
     setIsFormOpen(true);
     setIsViewing(false);
+    setIsEditing(false);
     setItemBeingEdited(null);
   }
 
-  function view(item: T) {
+  function onEdit(item: EntityType) {             
+    setItemBeingEdited(item);
+    setIsFormOpen(true);
+    setIsEditing(true);
+    setIsViewing(false);
+  }
+
+  function onView(item: EntityType) {    
     setItemBeingEdited(item);
     setIsViewing(true);
     setIsFormOpen(true);
@@ -91,15 +106,15 @@ export function useCrud<T>({ endpoint, filters = {} }: UseCrudOptions) {
     setItemBeingEdited(null);
   }
 
-  async function create(payload: Partial<T>) {
-    const response = await backendApi.post<T>(endpoint, payload);
+  async function create(payload: Partial<FormDtoType>) {    
+    const response = await backendApi.post<FormDtoType>(endpoint, payload);
     cancelForm();
     fetchData();
     return response.data;
   }
 
-  async function update(id: string, payload: Partial<T>) {
-    const response = await backendApi.put<T>(`${endpoint}/${id}`, payload);
+  async function update(id: string, payload: Partial<FormDtoType>) {            
+    const response = await backendApi.put<FormDtoType>(`${endpoint}/${id}`, payload);
     cancelForm();
     fetchData();
     return response.data;
@@ -110,11 +125,11 @@ export function useCrud<T>({ endpoint, filters = {} }: UseCrudOptions) {
     fetchData();
   }
 
-  async function changeStatus(id: string, statusField: keyof T = 'isActive' as keyof T) {
-    const item = items.find((i) => (i as any).id === id);
+  async function changeStatus(id: string) {
+    const item = items.find((i) => (i as BaseEntity).id === id) as BaseEntity;
     if (!item) return;
 
-    const updated = { [statusField]: !(item as any)[statusField] };
+    const updated = { 'isActive': !item.isActive } as Partial<FormDtoType>;
     await backendApi.patch(`${endpoint}/${id}`, updated);
     fetchData();
   }
@@ -123,6 +138,7 @@ export function useCrud<T>({ endpoint, filters = {} }: UseCrudOptions) {
     items,
     itemBeingEdited,
     isViewing,
+    isEditing,
     isFormOpen,
     loading,
     page,
@@ -131,7 +147,8 @@ export function useCrud<T>({ endpoint, filters = {} }: UseCrudOptions) {
     hasNextPage,
     hasPreviousPage,
     openForm,
-    view,
+    onView,
+    onEdit,
     cancelForm,
     create,
     update,
@@ -142,5 +159,6 @@ export function useCrud<T>({ endpoint, filters = {} }: UseCrudOptions) {
     onPageSizeChange,
     setPage,
     setPageSize,
+    setLoading,
   };
 }

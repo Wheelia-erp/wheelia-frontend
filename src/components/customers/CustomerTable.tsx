@@ -1,6 +1,5 @@
 'use client';
 
-import { Customer } from '@/modules/customers/customer.types';
 import Table from '@/components/shared/table/Table';
 import TableHead from '@/components/shared/table/TableHead';
 import TableBody from '@/components/shared/table/TableBody';
@@ -8,9 +7,10 @@ import TableHeader from '@/components/shared/table/TableHeader';
 import { CustomerRow } from './CustomerRow';
 import CustomerTableEmpty from './CustomerTableEmpty';
 import TableHeaderRow from '../shared/table/TableHarderRow';
+import { CustomerEntity } from '@/app/customers/entity/customer.entity';
 
 interface CustomerTableProps {
-  customers: Customer[];
+  customers: CustomerEntity[];
   loading?: boolean;
   page: number;
   pageSize: number;
@@ -22,13 +22,13 @@ interface CustomerTableProps {
   // eslint-disable-next-line no-unused-vars
   onPageSizeChange: (size: number) => void;
   // eslint-disable-next-line no-unused-vars
-  onEdit: (customer: Customer) => void;
+  onEdit: (customer: CustomerEntity) => void;
   // eslint-disable-next-line no-unused-vars
-  onView: (customer: Customer) => void;
+  onView: (customer: CustomerEntity) => void;
   // eslint-disable-next-line no-unused-vars
-  onDelete: (customer: Customer) => void;
+  onDelete: (customer: CustomerEntity) => void;
   // eslint-disable-next-line no-unused-vars
-  onChangeStatus: (customer: Customer) => void;
+  onChangeStatus: (customer: CustomerEntity) => void;
 }
 
 export default function CustomerTable({
@@ -36,10 +36,8 @@ export default function CustomerTable({
   loading,
   page,
   pageSize,
-  totalItems,
-  // eslint-disable-next-line no-unused-vars
-  hasNextPage,
-  // eslint-disable-next-line no-unused-vars
+  totalItems, 
+  hasNextPage,  
   hasPreviousPage,
   onNextPage,
   onPreviousPage,
