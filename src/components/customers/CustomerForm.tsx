@@ -130,10 +130,10 @@ export function CustomerForm({
 
           {watchPersonType === "PJ" && (
             <FormFieldWrapper
-              label="Abertura da Empresa"              
+              label="Abertura da Empresa"
               error={form.formState.errors.openingDate}
             >
-              <FormInputDate
+              <FormInputDate                
                 {...form.register("openingDate")}                
                 disabled={readOnly}
               />
@@ -145,8 +145,7 @@ export function CustomerForm({
               error={form.formState.errors.birthDate}
             >
               <FormInputDate
-                {...form.register("birthDate")}   
-                control={form.control}             
+                {...form.register("birthDate")}                
                 disabled={readOnly}
               />
             </FormFieldWrapper>
