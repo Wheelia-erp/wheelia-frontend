@@ -9,6 +9,7 @@ import { FormTextarea } from '@/components/form/FormTextarea';
 import { FormSection } from '@/components/form/FormSection';
 import { CustomerEntity } from '@/app/customers/entity/customer.entity';
 import { FormInputDate } from '../form/FormInputDate';
+import { FormInputCep } from '../form/FormInputCep';
 
 interface CustomerFormProps {
   defaultValues?: Partial<CustomerEntity>;
@@ -157,17 +158,10 @@ export function CustomerForm({
 
       {/* Endereço */}
       <FormSection title="Endereço">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <FormFieldWrapper label="País" error={form.formState.errors.country}>
-            <FormInput {...form.register("country")} disabled={readOnly} />
-          </FormFieldWrapper>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">          
 
           <FormFieldWrapper label="CEP" error={form.formState.errors.zipCode}>
-            <Controller
-              name="zipCode"
-              control={form.control}
-              render={({ field }) => <MaskedInput {...field} mask="cep" />}
-            />
+            <FormInputCep name="zipCode" disabled={readOnly} />
           </FormFieldWrapper>
 
           <FormFieldWrapper
@@ -181,12 +175,11 @@ export function CustomerForm({
             <FormInput {...form.register("number")} disabled={readOnly} />
           </FormFieldWrapper>
 
-          <FormFieldWrapper label="Estado" error={form.formState.errors.state}>
-            <FormInput {...form.register("state")} disabled={readOnly} />
-          </FormFieldWrapper>
-
-          <FormFieldWrapper label="Cidade" error={form.formState.errors.city}>
-            <FormInput {...form.register("city")} disabled={readOnly} />
+          <FormFieldWrapper
+            label="Complemento"
+            error={form.formState.errors.complement}
+          >
+            <FormInput {...form.register("complement")} disabled={readOnly} />
           </FormFieldWrapper>
 
           <FormFieldWrapper
@@ -196,11 +189,16 @@ export function CustomerForm({
             <FormInput {...form.register("neighborhood")} disabled={readOnly} />
           </FormFieldWrapper>
 
-          <FormFieldWrapper
-            label="Complemento"
-            error={form.formState.errors.complement}
-          >
-            <FormInput {...form.register("complement")} disabled={readOnly} />
+          <FormFieldWrapper label="Cidade" error={form.formState.errors.city}>
+            <FormInput {...form.register("city")} disabled={readOnly} />
+          </FormFieldWrapper>
+
+          <FormFieldWrapper label="Estado" error={form.formState.errors.state}>
+            <FormInput {...form.register("state")} disabled={readOnly} />
+          </FormFieldWrapper>
+
+          <FormFieldWrapper label="País" error={form.formState.errors.country}>
+            <FormInput {...form.register("country")} disabled={readOnly} />
           </FormFieldWrapper>
         </div>
       </FormSection>

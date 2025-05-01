@@ -1,16 +1,15 @@
+'use client';
+
 import { forwardRef } from 'react';
-import { cn } from '@/lib/utils'; 
+import { cn } from '@/lib/utils';
 import { FormInput } from './FormInput';
 
 interface MaskedInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   mask: 'cep' | 'cpf' | 'cnpj' | 'phone';
-  value?: string;
-  // eslint-disable-next-line no-unused-vars
-  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 export const MaskedInput = forwardRef<HTMLInputElement, MaskedInputProps>(
-  ({ mask, onChange, className, value, ...props }, ref) => {
+  ({ mask, className, value, onChange, onBlur, name, ...props }, ref) => {
     const applyMask = (raw: string) => {
       const numbers = raw.replace(/\D/g, '');
       if (mask === 'cep') {
@@ -42,23 +41,18 @@ export const MaskedInput = forwardRef<HTMLInputElement, MaskedInputProps>(
     const handleMaskedChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       const raw = e.target.value;
       const masked = applyMask(raw);
-      const event = {
-        ...e,
-        target: {
-          ...e.target,
-          value: masked,
-        },
-      };
-      onChange?.(event);
+      onChange?.({ ...e, target: { ...e.target, value: masked } });
     };
 
     return (
       <FormInput
-        {...props}
         ref={ref}
+        name={name}
         value={value ?? ''}
         onChange={handleMaskedChange}
+        onBlur={onBlur}
         className={cn(className)}
+        {...props}
       />
     );
   }
