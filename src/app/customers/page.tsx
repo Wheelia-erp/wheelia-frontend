@@ -11,6 +11,7 @@ import { FormButton } from '@/components/form/FormButton';
 import { useState } from 'react';
 import { CustomerEntity } from './entity/customer.entity';
 import { CustomerFormDto } from './dto/customer-form.dto';
+import { sanitizeForm } from '@/lib/utils';
 
 export default function CustomersPage() {
   const [filters, setFilters] = useState<Record<string, FilterValue>>({});
@@ -47,7 +48,7 @@ export default function CustomersPage() {
 
   const handleSubmit = async (data: CustomerEntity) => {        
     try {
-      const dataToSave = new CustomerFormDto(data);       
+      const dataToSave = sanitizeForm(new CustomerFormDto(data));       
       if (itemBeingEdited) {        
         await update(itemBeingEdited.id, dataToSave);
         toast.success('Cliente atualizado com sucesso!');

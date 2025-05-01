@@ -1,39 +1,57 @@
-import { Controller } from 'react-hook-form';
+import { Controller, useFormContext } from 'react-hook-form';
+import { cn } from '@/lib/utils';
 import { FormInput } from './FormInput';
 
-interface Props {
+interface FormInputDateProps {
   name: string;
   label?: string;
+  className?: string;
   disabled?: boolean;
-  control?: any;
 }
 
-export function FormInputDate({ name, label, disabled, control }: Props) {  
+export function FormInputDate({
+  name,
+  label,
+  className,
+  disabled = false,
+}: FormInputDateProps) {
+  const {
+    control,
+    formState: { errors },
+  } = useFormContext();
+
+  const errorMessage = errors?.[name]?.message as string | undefined;
 
   return (
-    <Controller
-      name={name}
-      control={control}
-      render={({ field }) => {
-        const formatted =
-          typeof field.value === 'string'
-            ? field.value.split('T')[0]
-            : field.value instanceof Date
-            ? field.value.toISOString().split('T')[0]
-            : '';
+    <div className="space-y-1">
+      {label && <label className="text-sm font-medium">{label}</label>}
 
-        return (
-          <div className="space-y-1">
-            {label && <label className="text-sm font-medium">{label}</label>}
+      <Controller
+        name={name}
+        control={control}
+        render={({ field }) => {
+          const formatted =
+            typeof field.value === 'string'
+              ? field.value.split('T')[0]
+              : field.value instanceof Date
+              ? field.value.toISOString().split('T')[0]
+              : '';
+
+          return (
             <FormInput
               type="date"
               {...field}
               value={formatted}
               disabled={disabled}
+              className={cn(className, errorMessage && 'border-red-500')}
             />
-          </div>
-        );
-      }}
-    />
+          );
+        }}
+      />
+
+      {errorMessage && (
+        <p className="text-sm text-red-600">{errorMessage}</p>
+      )}
+    </div>
   );
 }

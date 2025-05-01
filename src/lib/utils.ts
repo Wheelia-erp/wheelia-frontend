@@ -1,3 +1,4 @@
+import { BaseFormDto } from "@/core/dto/base-form.dto";
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 
@@ -23,3 +24,13 @@ export function undefinedWhenEmpty(value: string | undefined) {
   }
   return value;
 }
+
+export function sanitizeForm(data: BaseFormDto) {
+  return Object.fromEntries(
+    Object.entries(data).map(([key, value]) => [
+      key,
+      value === '' ? undefined : value,
+    ])
+  );
+}
+

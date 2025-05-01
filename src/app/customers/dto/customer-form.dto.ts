@@ -30,7 +30,7 @@ export class CustomerFormDto extends BaseFormDto {
           document: data.document,
           name: data.name,
           reference: data.reference,
-          email: data.email,
+          email: undefinedWhenEmpty(data.email),
           phone: data.phone,
           mobile: data.mobile,
           birthDate: undefinedWhenEmpty(data.birthDate),
@@ -44,6 +44,6 @@ export class CustomerFormDto extends BaseFormDto {
           neighborhood: data.neighborhood,
           complement: data.complement,
           notes: data.notes,
-        });
+        });        
     }
 }
