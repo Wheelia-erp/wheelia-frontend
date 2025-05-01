@@ -133,8 +133,9 @@ export function CustomerForm({
               label="Abertura da Empresa"
               error={form.formState.errors.openingDate}
             >
-              <FormInputDate                
-                {...form.register("openingDate")}                
+              <FormInputDate
+                {...form.register("openingDate")}
+                name="openingDate"                
                 disabled={readOnly}
               />
             </FormFieldWrapper>
@@ -145,7 +146,8 @@ export function CustomerForm({
               error={form.formState.errors.birthDate}
             >
               <FormInputDate
-                {...form.register("birthDate")}                
+                {...form.register("birthDate")}
+                name="birthDate"      
                 disabled={readOnly}
               />
             </FormFieldWrapper>
