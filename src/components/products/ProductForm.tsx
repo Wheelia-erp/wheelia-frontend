@@ -36,7 +36,7 @@ export default function ProductForm({ readOnly, form }: ProductFormProps) {
               <FormInput {...form.register("name")} disabled={readOnly} />
             </FormFieldWrapper>
             <FormFieldWrapper
-              label="Preço"
+              label="Valor base"
               required={!readOnly}
               error={form.formState.errors.price?.message}
             >
@@ -64,7 +64,7 @@ export default function ProductForm({ readOnly, form }: ProductFormProps) {
         <FormSection title="Informações Adicionais">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <FormFieldWrapper
-              label="Ciclo de vida"
+              label="Tipo de cobrança"
               required={!readOnly}
               error={form.formState.errors.lifeCycleType?.message}
             >
@@ -80,7 +80,7 @@ export default function ProductForm({ readOnly, form }: ProductFormProps) {
               </FormSelect>
             </FormFieldWrapper>
             <FormFieldWrapper
-              label="Cobrança fracionada"
+              label="Permitir cobrança proporcional no upgrade?"
               required={!readOnly}
               error={form.formState.errors.proration?.message}
             >
@@ -109,13 +109,13 @@ export default function ProductForm({ readOnly, form }: ProductFormProps) {
               <FormInput {...form.register("cnaeCode")} disabled={readOnly} />
             </FormFieldWrapper>
             <FormFieldWrapper
-              label="Alíquota ISS"
+              label="Alíquota de ISS (%)"
               error={form.formState.errors.issRate?.message}
             >
               <FormInput {...form.register("issRate")} disabled={readOnly} />
             </FormFieldWrapper>
             <FormFieldWrapper
-              label="Código de Serviço (Municipal)"
+              label="Código do serviço municipal"
               error={form.formState.errors.municipalServiceCode?.message}
             >
               <FormInput
@@ -124,7 +124,7 @@ export default function ProductForm({ readOnly, form }: ProductFormProps) {
               />
             </FormFieldWrapper>
             <FormFieldWrapper
-              label="Descrição para Nota Fiscal"
+              label="Descrição fiscal para NFS-e"
               error={form.formState.errors.nfseDescription?.message}
             >
               <FormInput

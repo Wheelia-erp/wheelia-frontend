@@ -15,13 +15,13 @@ export function ProductSummary({ data }: ProducSummaryProps) {
       {/* Dados Gerais */}
       <FormSection title="Dados Gerais">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
-          <SummaryItem label="Código" value={data.code} />
+          <SummaryItem label="Identificador" value={data.code} />
           <SummaryItem label="Nome" value={data.name} />
-          <SummaryItem label="Preço" value={data.price?.toString()} />
+          <SummaryItem label="Valor base" value={data.price?.toString()} />
           <SummaryItem label="Unidade de medida" value={data.unit} />
         </div>
         <div className="p-3 bg-gray-50 rounded border text-sm text-gray-700 whitespace-pre-line">
-          {data.description || "Nenhuma observação informada."}
+          {data.description || "Nenhuma descrição foi informada."}
         </div>
       </FormSection>
 
@@ -29,23 +29,23 @@ export function ProductSummary({ data }: ProducSummaryProps) {
       <FormSection title="Informações Adicionais">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
           <SummaryItem
-            label="Ciclo de vida"
+            label="Tipo de cobrança"
             value={getLabelByValue(LifeCycleTypes, data.lifeCycleType)}
           />
-          <SummaryItem label="Cobrança fracionada" value={getLabelByValue(ProrationPolicies, data.proration)} />
+          <SummaryItem label="Permitir cobrança proporcional no upgrade?" value={getLabelByValue(ProrationPolicies, data.proration)} />
         </div>
       </FormSection>
       <FormSection title="Informações Fiscais">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
           <SummaryItem label="Código NBS" value={data.nbsCode} />
           <SummaryItem label="Código CNAE" value={data.cnaeCode} />
-          <SummaryItem label="Alíquota ISS" value={data.issRate?.toString()} />
+          <SummaryItem label="Alíquota de ISS (%)" value={data.issRate?.toString()} />
           <SummaryItem
-            label="Código de Serviço (Municipal)"
+            label="Código do serviço municipal"
             value={data.municipalServiceCode?.toString()}
           />
           <SummaryItem
-            label="Descrição do serviço para Nota Fiscal"
+            label="Descrição fiscal para NFS-e"
             value={data.nfseDescription?.toString()}
           />
         </div>
