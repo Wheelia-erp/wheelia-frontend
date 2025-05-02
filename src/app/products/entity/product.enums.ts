@@ -12,6 +12,6 @@ export type LifeCycleType = (typeof LifeCycleTypes)[keyof typeof LifeCycleTypes]
 
 export const ProrationPolicies = {
   FULL: { value: "full", label: "Valor Integral" },
-  PROPORTIONAL: { value: "proportional", label: "Proportional ao período" },
+  PROPORTIONAL: { value: "proportional", label: "Proporcional ao período" },
 }
 export type ProrationPolicy = typeof ProrationPolicies[keyof typeof ProrationPolicies]['value'];
