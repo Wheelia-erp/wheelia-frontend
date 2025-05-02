@@ -46,9 +46,9 @@ export default function ProductTable({ products, loading, page, pageSize, totalI
             >
             <TableHead>
                 <TableHeaderRow>
-                    <TableHeader>Código</TableHeader>
+                    <TableHeader>Identificador</TableHeader>
                     <TableHeader>Nome</TableHeader>
-                    <TableHeader>Preço</TableHeader>
+                    <TableHeader>Valor base</TableHeader>
                     <TableHeader>Status</TableHeader>
                     <TableHeader>Ações</TableHeader>
                 </TableHeaderRow>
