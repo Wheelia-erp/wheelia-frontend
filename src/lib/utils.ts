@@ -34,3 +34,10 @@ export function sanitizeForm(data: BaseFormDto) {
   );
 }
 
+export function getLabelByValue<T extends Record<string, { value: string; label: string }>>(
+  map: T,
+  value: string
+): string {
+  const match = Object.values(map).find(option => option.value === value);
+  return match?.label ?? value;
+}

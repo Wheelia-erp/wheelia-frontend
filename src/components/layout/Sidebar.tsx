@@ -4,12 +4,16 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
   Home,
-  Users,
-  CreditCard,
+  Users,  
   DollarSign,
   Settings,
   ChevronRight,
   ChevronLeft,
+  Package,
+  ShoppingCart,
+  FileSignature,
+  FileText,
+  Receipt,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -22,8 +26,12 @@ interface SidebarProps {
 const navItems = [
   { label: 'Dashboard', icon: Home, href: '/dashboard' },
   { label: 'Clientes', icon: Users, href: '/customers' },
-  { label: 'Assinaturas', icon: CreditCard, href: '/subscriptions' },
+  { label: 'Produtos', icon: Package, href: '/products' },
+  { label: 'Orçamentos', icon: FileText, href: '/proposals' },
+  { label: 'Vendas', icon: ShoppingCart, href: '/sales' },
+  { label: 'Contratos', icon: FileSignature, href: '/contracts' },  
   { label: 'Pagamentos', icon: DollarSign, href: '/payments' },
+  { label: 'Notas Fiscais', icon: Receipt, href: '/invoices' },
   {
     label: 'Configurações',
     icon: Settings,
