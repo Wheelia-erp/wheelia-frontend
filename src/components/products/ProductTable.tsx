@@ -77,5 +77,5 @@ export default function ProductTable({ products, loading, page, pageSize, totalI
                 )}
             </TableBody>
         </Table>
-     );
+    );
 }

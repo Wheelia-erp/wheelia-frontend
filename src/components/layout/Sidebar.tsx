@@ -27,7 +27,7 @@ const navItems = [
   { label: 'Dashboard', icon: Home, href: '/dashboard' },
   { label: 'Clientes', icon: Users, href: '/customers' },
   { label: 'Produtos', icon: Package, href: '/products' },
-  { label: 'Orçamentos', icon: FileText, href: '/proposals' },
+  { label: 'Orçamentos', icon: FileText, href: '/quotes' },
   { label: 'Vendas', icon: ShoppingCart, href: '/sales' },
   { label: 'Contratos', icon: FileSignature, href: '/contracts' },  
   { label: 'Pagamentos', icon: DollarSign, href: '/payments' },
