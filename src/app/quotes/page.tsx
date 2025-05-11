@@ -105,9 +105,9 @@ return (
               />
             )}
             {!isFormOpen && (
-                <FormButton onClick={() => openForm()}>
-                    Novo Orçamento
-                </FormButton>
+              <FormButton onClick={() => openForm()}>
+                Novo Orçamento
+              </FormButton>
             )}
         </div>
       </div>

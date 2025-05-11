@@ -68,7 +68,7 @@ export function QuoteFormWrapper(props: QuoteFormWrapperProps) {
         }
       >
         {readOnly ? (
-          <QuoteSummary data={defaultValues as QuoteEntity} />
+          <QuoteSummary form={form} data={defaultValues as QuoteEntity} />
         ) : (
           <QuoteForm readOnly={readOnly} form={form} />
         )}

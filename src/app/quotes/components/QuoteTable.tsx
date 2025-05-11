@@ -1,13 +1,12 @@
 'use client';
 
-import Table from "@/components/shared/table/Table";
 import { QuoteEntity } from "../entity/quote.entity";
-import TableHead from "@/components/shared/table/TableHead";
-import TableHeader from "@/components/shared/table/TableHeader";
-import TableHeaderRow from "@/components/shared/table/TableHarderRow";
-import TableBody from "@/components/shared/table/TableBody";
-import QuoteTableEmpty from "./QuoteTableEmpty";
-import { QuoteTableRow } from "./QuoteTableRow";
+import GenericTable from "@/components/shared/table/GenericTable";
+import { currencyFormat, formatDate, getLabelByValue } from "@/lib/utils";
+import { ConfirmDeleteDialog } from "@/components/shared/dialogs/ConfirmDeleteDialog";
+import { QuoteStatuses } from "../entity/quote.enum";
+import { useState } from "react";
+import { RowActions } from "@/components/shared/table/RowActions";
 
 
 interface QuoteTableProps {
@@ -33,53 +32,78 @@ interface QuoteTableProps {
 }
 
 export default function QuoteTable(props: QuoteTableProps) {
-  const { quotes, loading, page, pageSize, totalItems, hasNextPage, hasPreviousPage, onNextPage, onPreviousPage, onPageSizeChange, onEdit, onView, onDelete, onChangeStatus } = props;  
-  return (
-    <Table
-      loading={loading}      
-      page={page}
-            pageSize={pageSize}
-            totalItems={totalItems}
-            hasNextPage={hasNextPage}
-            hasPreviousPage={hasPreviousPage}
-            onNextPage={onNextPage}
-            onPreviousPage={onPreviousPage}
-            onPageSizeChange={onPageSizeChange}  
-    >
-      <TableHead>
-        <TableHeaderRow>
-          <TableHeader>#ID</TableHeader>
-          <TableHeader>Cliente</TableHeader>
-          <TableHeader>Total</TableHeader>
-          <TableHeader>Expira em</TableHeader>
-          <TableHeader>Status</TableHeader>
-          <TableHeader>Ações</TableHeader>
-        </TableHeaderRow>
-      </TableHead>
-      <TableBody
-        loading={loading}
-        skeletonColumns={5}
-        skeletonRows={5}>
-          {!loading && (
-            <>
-              {quotes.length === 0 ? (
-                <QuoteTableEmpty />
-              ) : (
-                quotes.map((quote, index) => (
-                  <QuoteTableRow
-                    key={index}
-                    quote={quote}
-                    onEdit={onEdit}
-                    onView={onView}
-                    onDelete={onDelete}
-                    onChangeStatus={onChangeStatus}
-                  />
-                ))
-              )}
-            </>
-          )}
+  const { quotes, loading, page, pageSize, totalItems, hasNextPage, hasPreviousPage, onNextPage, onPreviousPage, onPageSizeChange, onEdit, onView, onDelete } = props;  
+  
+  const [selected, setSelected] = useState(false);
 
-      </TableBody>
-    </Table>
+  const handleClick = (quote: QuoteEntity) => {
+    setSelected(true);
+    onView(quote);
+  };
+
+  return (
+    <GenericTable
+      selected={selected}
+      loading={loading}
+      columns={[
+        { label: '#Id', field: 'code' },
+        {
+          label: 'Cliente',
+          field: 'customer',
+          format: (customer: any) => customer.document + ' - ' + customer.name,
+        },
+        {
+          label: 'Valor',
+          field: 'total',
+          format: (total: string) => currencyFormat(total),
+        },
+        {
+          label: 'Validade',
+          field: 'expirationDate',
+          format: (validityDate: string) => formatDate(validityDate),
+        },
+        {
+          label: 'Status',
+          field: 'status',
+          format: (status: string) => getLabelByValue(QuoteStatuses, status),
+        },
+      ]}
+      data={quotes}
+      page={page}
+      pageSize={pageSize}
+      totalItems={totalItems}
+      hasNextPage={hasNextPage}
+      hasPreviousPage={hasPreviousPage}
+      onNextPage={onNextPage}
+      onPreviousPage={onPreviousPage}
+      onPageSizeChange={onPageSizeChange}
+      onRowClick={handleClick}
+      actions={(quote) => (
+        <RowActions>
+          <button
+            className="w-full px-3 py-2 rounded-md hover:bg-gray-50 text-left"
+            onClick={(e) => {
+              e.stopPropagation();
+              onEdit(quote);
+            }}
+          >
+            Editar
+          </button>
+          <ConfirmDeleteDialog
+            onConfirm={() => onDelete(quote)}
+            trigger={
+              <button
+                className="w-full px-3 py-2 rounded-md hover:bg-red-50 text-left text-red-600"
+                onClick={(e) => e.stopPropagation()}
+              >
+                Excluir
+              </button>
+            }
+            title="Excluir orçamento"
+            description={`Tem certeza que deseja excluir ${quote.customerId}?\nEsta ação não poderá ser desfeita.`}
+          />
+        </RowActions>
+      )}
+    />
   );
 }

@@ -1,43 +1,48 @@
+import { EnumOption } from '@/core/enum/base.enum';
+
 export const QuoteStatuses = {
-  DRAFT: { value: "draft", label: "Rascunho" },
-  SENT: { value: "sent", label: "Enviado" },
-  ACCEPTED: { value: "accepted", label: "Aceito" },
-  REJECTED: { value: "rejected", label: "Rejeitado" },
-  CANCELLED: { value: "cancelled", label: "Cancelado" },
-  EXPIRED: { value: "expired", label: "Expirado" },
+  DRAFT: { value: 'draft', label: 'Rascunho' } as EnumOption,
+  SENT: { value: 'sent', label: 'Enviado' } as EnumOption,
+  ACCEPTED: { value: 'accepted', label: 'Aceito' } as EnumOption,
+  REJECTED: { value: 'rejected', label: 'Rejeitado' } as EnumOption,
+  CANCELLED: { value: 'cancelled', label: 'Cancelado' } as EnumOption,
+  EXPIRED: { value: 'expired', label: 'Expirado' } as EnumOption,
 };
 export type QuoteStatus =
-  (typeof QuoteStatuses)[keyof typeof QuoteStatuses]["value"];
+  (typeof QuoteStatuses)[keyof typeof QuoteStatuses]['value'];
 
 export const LifeCycleTypes = {
-  ONE_TIME: { value: "one_time", label: "Avulso" },
-  RECURRING: { value: "recurring", label: "Recurrente" },
+  ONE_TIME: { value: 'one_time', label: 'Avulso' } as EnumOption,
+  RECURRING: { value: 'recurring', label: 'Recorrente' } as EnumOption,
 };
 export type LifeCycleType =
-  (typeof LifeCycleTypes)[keyof typeof LifeCycleTypes]["value"];
+  (typeof LifeCycleTypes)[keyof typeof LifeCycleTypes]['value'];
 
 export const BillingPeriods = {
-  MONTHLY: { value: "monthly", label: "Mensal" },
-  BIMONTHLY: { value: "bimonthly", label: "Bimestral" },
-  QUARTERLY: { value: "quarterly", label: "Trimestral" },
-  SEMIANNUAL: { value: "semiannual", label: "Semestral" },
-  ANNUALLY: { value: "annually", label: "Anual" },
+  MONTHLY: { value: 'monthly', label: 'Mensal' } as EnumOption,
+  BIMONTHLY: { value: 'bimonthly', label: 'Bimestral' } as EnumOption,
+  QUARTERLY: { value: 'quarterly', label: 'Trimestral' } as EnumOption,
+  SEMIANNUAL: { value: 'semiannual', label: 'Semestral' } as EnumOption,
+  ANNUALLY: { value: 'annually', label: 'Anual' } as EnumOption,
 };
 export type BillingPeriod =
-  (typeof BillingPeriods)[keyof typeof BillingPeriods]["value"];
+  (typeof BillingPeriods)[keyof typeof BillingPeriods]['value'];
 
 export const PaymentForms = {
-  UPFRONT: { value: "upfront", label: "À vista" },
-  INSTALLMENT: { value: "installment", label: "Parcelado" },
+  UPFRONT: { value: 'upfront', label: 'À vista' } as EnumOption,
+  INSTALLMENT: { value: 'installment', label: 'Parcelado' } as EnumOption,
 };
 export type PaymentForm =
-  (typeof PaymentForms)[keyof typeof PaymentForms]["value"];
+  (typeof PaymentForms)[keyof typeof PaymentForms]['value'];
 
 export const PaymentMethods = {
-  CREDIT_CARD: { value: "credit_card", label: "Cartão de Crédito" },
-  DEBIT_CARD: { value: "debit_card", label: "Cartão de Débito" },
-  PIX: { value: "pix", label: "PIX" },
-  CASH: { value: "cash", Label: "Dinheiro" },
+  CREDIT_CARD: {
+    value: 'credit_card',
+    label: 'Cartão de Crédito',
+  } as EnumOption,
+  DEBIT_CARD: { value: 'debit_card', label: 'Cartão de Débito' } as EnumOption,
+  PIX: { value: 'pix', label: 'PIX' } as EnumOption,
+  CASH: { value: 'cash', label: 'Dinheiro' } as EnumOption,
 };
 export type PaymentMethod =
-  (typeof PaymentMethods)[keyof typeof PaymentMethods]["value"];
+  (typeof PaymentMethods)[keyof typeof PaymentMethods]['value'];
