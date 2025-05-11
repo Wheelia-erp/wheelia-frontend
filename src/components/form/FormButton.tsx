@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils'; // helper para juntar classes condicionalmente
+import { cn } from '@/lib/utils'; 
 
 export function FormButton(props: React.ComponentProps<typeof Button>) {
   const { className, variant, ...rest } = props;

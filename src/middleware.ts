@@ -1,12 +1,12 @@
 // middleware.ts
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse } from 'next/server';
 
 export function middleware(req: NextRequest) {
-  const token = req.cookies.get("token")?.value;
+  const token = req.cookies.get('token')?.value;
 
   // Se não tiver token, redireciona para login
   if (!token) {
-    return NextResponse.redirect(new URL("/login", req.url));
+    return NextResponse.redirect(new URL('/login', req.url));
   }
 
   // Senão, continua normalmente
@@ -14,5 +14,5 @@ export function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*"], // protege qualquer rota /dashboard/**
+  matcher: ['/((?!api|login|signup|public|_next|favicon.ico).*)'],
 };
