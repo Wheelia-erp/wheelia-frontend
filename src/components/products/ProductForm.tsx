@@ -6,8 +6,8 @@ import { FormSection } from "../form/FormSection";
 import { useForm } from "react-hook-form";
 import { FormInput } from "../form/FormInput";
 import { FormTextarea } from "../form/FormTextarea";
-import { FormSelect } from "../form/FormSelect";
 import { LifeCycleTypes, ProrationPolicies } from "@/app/products/entity/product.enums";
+import FormSelect from "../form/FormSelect";
 
 interface ProductFormProps {    
     readOnly?: boolean;
@@ -68,29 +68,14 @@ export default function ProductForm({ readOnly, form }: ProductFormProps) {
               required={!readOnly}
               error={form.formState.errors.lifeCycleType?.message}
             >
-              <FormSelect
-                {...form.register("lifeCycleType")}
-                disabled={readOnly}
-              >
-                {Object.values(LifeCycleTypes).map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </FormSelect>
+              <FormSelect name="proration" enumSource={LifeCycleTypes} />              
             </FormFieldWrapper>
             <FormFieldWrapper
               label="Permitir cobrança proporcional no upgrade?"
               required={!readOnly}
               error={form.formState.errors.proration?.message}
             >
-              <FormSelect {...form.register("proration")} disabled={readOnly}>
-                {Object.values(ProrationPolicies).map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </FormSelect>
+              <FormSelect name="proration" enumSource={ProrationPolicies} />              
             </FormFieldWrapper>
           </div>
         </FormSection>
