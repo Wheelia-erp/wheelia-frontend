@@ -12,9 +12,11 @@ interface FormSelectProps {
   options?: EnumOption[];
   enumSource?: Record<string, EnumOption>; // Enum garantindo o formato de value e label
   placeholder?: string;
+  // eslint-disable-next-line no-unused-vars
+  onChange?: (value: string) => void;
 }
 
-const FormSelect: React.FC<FormSelectProps> = ({ name, options, enumSource, placeholder }) => {
+const FormSelect: React.FC<FormSelectProps> = ({ name, options, enumSource, placeholder, onChange }) => {
   const { register, setValue } = useFormContext();
   const [enumOptions, setEnumOptions] = useState<EnumOption[]>([]);
 
@@ -30,6 +32,7 @@ const FormSelect: React.FC<FormSelectProps> = ({ name, options, enumSource, plac
 
   const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setValue(name, event.target.value);
+    onChange && onChange(event.target.value);
   };
 
   return (

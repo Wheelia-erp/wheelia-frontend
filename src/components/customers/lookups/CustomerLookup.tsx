@@ -1,40 +1,47 @@
 import React, { useEffect } from 'react';
 import { CustomerEntity } from '@/app/customers/entity/customer.entity';
-import Lookup from '@/components/shared/lookup/Lookup';
-import { useFormContext } from 'react-hook-form';
+import { useFormContext, useWatch } from 'react-hook-form';
+import LookupAutoComplete from '@/components/shared/lookup/LookupAutoComplete';
 
 interface CustomerLookupProps {
   name: string;
   placeholder?: string;
-  initialValue?: { id: string; name: string }; // ID e Nome do cliente inicial
+  initialValue?: { id: string; name: string };
   // eslint-disable-next-line no-unused-vars
   onSelect?: (item: CustomerEntity) => void;
 }
 
 const CustomerLookup: React.FC<CustomerLookupProps> = ({ name, placeholder, initialValue, onSelect }) => {
-  const [initialLabel, setInitialLabel] = React.useState<string>('');
-  const { setValue } = useFormContext();
+  const { setValue, control } = useFormContext();
+  const selectedValue = useWatch({ control, name }) || '';
 
   useEffect(() => {
-    if (initialValue) {
-      setInitialLabel(initialValue.name);
+    if (initialValue && !selectedValue) {
       setValue(name, initialValue.id);
     }
   }, [initialValue, name, setValue]);
 
-  const handleSelect = (item: CustomerEntity) => {
-    if (onSelect) onSelect(item);    
-    setInitialLabel(item.name);
-    setValue(name, item.id);
+  const handleSelect = (customer: CustomerEntity) => {
+    setValue(name, customer.id);
+    if (onSelect && initialValue) {      
+      onSelect(customer);
+    }
   };
 
   return (
-    <Lookup
-      name={name}
-      endpoint="/customers/lookup/search"
+    <LookupAutoComplete
+      apiUrl="/customers"
+      searchParamName="q"
+      displayField="name"
+      valueField="id"
       placeholder={placeholder || 'Buscar cliente...'}
+      initialValue={initialValue?.id}
+      initialDisplayValue={initialValue?.name || ''}
       onSelect={handleSelect}
-      key={initialLabel}
+      noResultsText="Nenhum cliente encontrado"
+      loadingText="Carregando clientes..."
+      minSearchChars={2}
+      debounceTimeout={300}
     />
   );
 };

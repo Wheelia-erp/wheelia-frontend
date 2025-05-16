@@ -6,6 +6,7 @@ import ProductLookup from '@/components/products/lookups/ProductLookup';
 import { FormInput } from '@/components/form/FormInput';
 import { currencyFormat } from '@/lib/utils';
 import { FormFieldWrapper } from '@/components/form/FormFieldWrapper';
+import { toast } from 'sonner';
 
 interface QuoteItemAddProps {
   className?: string;
@@ -30,10 +31,10 @@ export default function QuoteItemAdd(props: QuoteItemAddProps) {
 
   function handleAddQuoteItem() {
     if (!quoteItem.productId) {
-      alert("Selecione um produto/serviço.");
+      toast.error("Selecione um produto!");
       return;
     }
-    alert("Estranho")
+    
     onAdd(quoteItem);
     setOpen(false);
     setQuoteItem({
@@ -61,13 +62,18 @@ export default function QuoteItemAdd(props: QuoteItemAddProps) {
               <ProductLookup
                 name="productId"
                 placeholder="Selecionar Produto/Serviço..."
-                onSelect={(item) =>
-                  setQuoteItem((prev) => ({
-                    ...prev,
-                    productId: item.id,
-                    product: item,
-                    description: item.name,
-                  }))
+                onSelect={(item) => 
+                  {
+                    if (item) {
+                      setQuoteItem((prev) => ({
+                        ...prev,                        
+                        productId: item.id,
+                        product: item,
+                        description: item.name,
+                        unitPrice: item.price || prev.unitPrice,
+                      } as QuoteItemEntity))
+                    }
+                  }
                 }
               />
             </FormFieldWrapper>
