@@ -1,15 +1,15 @@
 'use client';
 
-import { useForm, Controller } from 'react-hook-form';
+import { CustomerEntity } from '@/app/customers/entity/customer.entity';
 import { FormFieldWrapper } from '@/components/form/FormFieldWrapper';
 import { FormInput } from '@/components/form/FormInput';
-import { MaskedInput } from '@/components/form/MaskedInput';
-import { FormToggleGroup } from '@/components/form/FormToggleGroup';
 import { FormTextarea } from '@/components/form/FormTextarea';
-import { FormSection } from '@/components/form/FormSection';
-import { CustomerEntity } from '@/app/customers/entity/customer.entity';
-import { FormInputDate } from '../form/FormInputDate';
+import { FormToggleGroup } from '@/components/form/FormToggleGroup';
+import { MaskedInput } from '@/components/form/MaskedInput';
+import { Controller, useForm } from 'react-hook-form';
+import { FormCard } from '../form/FormCard';
 import { FormInputCep } from '../form/FormInputCep';
+import { FormInputDate } from '../form/FormInputDate';
 
 interface CustomerFormProps {
   defaultValues?: Partial<CustomerEntity>;
@@ -35,7 +35,7 @@ export function CustomerForm({
   return (
     <>
       {/* Dados Gerais */}
-      <FormSection title="Dados Gerais">
+      <FormCard title="Dados Gerais">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <FormFieldWrapper
             label="Tipo de Pessoa"
@@ -91,10 +91,10 @@ export function CustomerForm({
             <FormInput {...form.register("reference")} disabled={readOnly} />
           </FormFieldWrapper>
         </div>
-      </FormSection>
+      </FormCard>
 
       {/* Informações Adicionais */}
-      <FormSection title="Informações Adicionais">
+      <FormCard title="Informações Adicionais">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <FormFieldWrapper
             label="E-mail Principal"
@@ -154,10 +154,10 @@ export function CustomerForm({
             </FormFieldWrapper>
           )}
         </div>
-      </FormSection>
+      </FormCard>
 
       {/* Endereço */}
-      <FormSection title="Endereço">
+      <FormCard title="Endereço">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">          
 
           <FormFieldWrapper label="CEP" error={form.formState.errors.zipCode}>
@@ -201,10 +201,10 @@ export function CustomerForm({
             <FormInput {...form.register("country")} disabled={readOnly} />
           </FormFieldWrapper>
         </div>
-      </FormSection>
+      </FormCard>
 
       {/* Observações */}
-      <FormSection title="Observações">
+      <FormCard title="Observações">
         <FormFieldWrapper
           label="Observações"
           error={form.formState.errors.notes}
@@ -215,7 +215,7 @@ export function CustomerForm({
             disabled={readOnly}
           />
         </FormFieldWrapper>
-      </FormSection>
+      </FormCard>
     </>
   );
 }

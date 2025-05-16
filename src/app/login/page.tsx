@@ -1,9 +1,9 @@
 'use client';
 
+import backendApi from '@/lib/backendApi';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import Image from 'next/image';
-import backendApi from '@/lib/backendApi';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -20,88 +20,111 @@ export default function LoginPage() {
     try {
       await backendApi.post('/auth/login', { email, password }, { withCredentials: true });
       router.push('/dashboard');
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       setError(err?.response?.data?.message || 'Erro ao fazer login');
       setIsSubmitting(false);
     }
   };
 
-  return (
-    <div className="min-h-screen flex bg-white">
+  return (  
+
+    <div className="min-h-screen flex bg-blue-50">
+      <div className="fixed top-0 left-0 right-0 z-30 h-16 flex justify-between items-center px-6 bg-[#1E293B] text-white shadow">
+        <div className="container mx-auto px-4 flex items-center justify-between">
+          <div className="flex items-left space-x-2">
+            <Image
+              src="/logo-wheelia.svg"
+              alt="Wheelia"
+              height={32}
+              width={180}
+              priority
+            />
+          </div>           
+        </div>
+      </div>      
+      
+
       {/* Lado esquerdo (formulário) */}
-      <div className="w-full md:w-[30%] flex flex-col justify-center px-8 sm:px-16 py-12">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-blue-700 mb-2">Acesse o Wheelia</h1>
-          <p className="text-gray-500">Plataforma inteligente de gestão recorrente</p>
+      <div className="w-full md:w-[40%] flex flex-col justify-center px-8 sm:px-16 py-12">
+       
+        <div className="mb-8 mt-16">           
+          <h1 className="text-3xl font-bold text-blue-900 mb-2">
+            Acesse o Wheelia
+          </h1>
+          <p className="text-gray-700 text-lg">
+            Simplifique o recorrente, potencialize resultados
+          </p>
         </div>
 
-        <form className="space-y-4" onSubmit={handleLogin}>
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-              E-mail
-            </label>
-            <input
-              type="email"
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500 text-gray-700 placeholder-gray-400"
-              placeholder="seu@email.com"
-              required
-            />
-          </div>
+        <div className="bg-white p-8 rounded-lg shadow-sm">
+          <form className="space-y-6" onSubmit={handleLogin}>
+            <div>
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Email
+              </label>
+              <input
+                type="email"
+                id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="block w-full border border-gray-200 rounded-md px-4 py-3 focus:ring-blue-500 focus:border-blue-500 text-gray-700 placeholder-gray-400"
+                placeholder="seu@email.com"
+                required
+              />
+            </div>
 
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-              Senha
-            </label>
-            <input
-              type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500 text-gray-700 placeholder-gray-400"
-              placeholder="••••••••"
-              required
-            />
-          </div>
+            <div>
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Senha
+              </label>
+              <input
+                type="password"
+                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="block w-full border border-gray-200 rounded-md px-4 py-3 focus:ring-blue-500 focus:border-blue-500 text-gray-700 placeholder-gray-400"
+                placeholder="••••••••"
+                required
+              />
+            </div>
 
-          <div className="flex items-center justify-between">
-            <label className="flex items-center text-sm text-gray-700">
-              <input type="checkbox" className="mr-2" /> Manter conectado
-            </label>
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 transition disabled:opacity-50 font-medium"
+            >
+              {isSubmitting ? 'Entrando...' : 'Entrar'}
+            </button>
+          </form>
+
+          {error && (
+            <p className="mt-4 text-sm text-red-500 text-center">{error}</p>
+          )}
+
+          <div className="mt-4 text-center">
             <a href="#" className="text-sm text-blue-600 hover:underline">
               Esqueci minha senha
             </a>
           </div>
-
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition disabled:opacity-50"
-          >
-            {isSubmitting ? 'Entrando...' : 'Entrar'}
-          </button>
-        </form>
-
-        {error && <p className="mt-4 text-sm text-red-500 text-center">{error}</p>}
-
-        <p className="mt-6 text-sm text-gray-600 text-center">
-          Ainda não tem conta?{' '}
-          <a href="/signup" className="text-blue-600 hover:underline">
-            Crie uma agora
-          </a>
-        </p>
+        </div>
       </div>
 
-      {/* Lado direito (imagem) */}
-      <div className="hidden md:flex w-[70%] bg-blue-50 p-10 items-center justify-center">
+      {/* Lado direito (ilustração) */}
+      <div className="hidden md:flex w-[60%] items-center justify-center p-8">
         <Image
-          src="/woman_dashboard_wheelia.webp"
+          src="/wheelia_login_illustration.png"
           alt="Ilustração Wheelia"
           width={800}
           height={600}
-          className="h-[90vh] w-auto object-cover rounded-lg shadow-md"
+          className="max-h-[90vh] w-auto object-contain rounded-lg shadow-sm"
+          priority
         />
       </div>
     </div>

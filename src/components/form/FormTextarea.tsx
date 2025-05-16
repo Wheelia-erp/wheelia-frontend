@@ -6,7 +6,7 @@ interface FormTextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaEle
 
 export const FormTextarea = forwardRef<HTMLTextAreaElement, FormTextareaProps>(({ className, ...props }, ref) => {
   return (
-    <textarea
+    <textarea      
       ref={ref}
       className={`border rounded-md px-3 py-2 w-full text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none ${className ?? ''}`}
       {...props}
