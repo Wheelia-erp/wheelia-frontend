@@ -1,6 +1,5 @@
 'use client';
 
-import { FormSection } from "@/components/form/FormSection";
 import { currencyFormat, formatDate, getLabelByValue } from "@/lib/utils";
 import { BillingPeriods, LifeCycleTypes, PaymentForms, PaymentMethods, QuoteStatuses } from "../entity/quote.enum";
 import QuoteItemsTable from "./QuoteItemsTable";
