@@ -12,8 +12,10 @@ import { FormButton } from "@/components/form/FormButton";
 import { QuoteSummary } from "./QuoteSummary";
 import QuoteForm from "./QuoteForm";
 
+
 interface QuoteFormWrapperProps {
   title: string;
+  identifier: string;
   defaultValues?: Partial<QuoteFormDto>;
   isViewing?: boolean;
   isEditing?: boolean;
@@ -25,7 +27,7 @@ interface QuoteFormWrapperProps {
 }
 
 export function QuoteFormWrapper(props: QuoteFormWrapperProps) {
-  const { title, defaultValues, isViewing, isEditing, readOnly, loading, onSubmit, onCancel } = props;
+  const { title, identifier, defaultValues, isViewing, isEditing, readOnly, loading, onSubmit, onCancel } = props;
 
   const form = useForm<QuoteEntity, QuoteFormDto>({
     resolver: fluentResolver<QuoteEntity>(new QuoteFormValidator()),
@@ -45,6 +47,7 @@ export function QuoteFormWrapper(props: QuoteFormWrapperProps) {
     <FormProvider {...form}>
       <FormPageTemplate
         title={title}
+        identifier={identifier}
         isViewing={isViewing}
         isEditing={isEditing}
         readOnly={readOnly}
@@ -70,7 +73,10 @@ export function QuoteFormWrapper(props: QuoteFormWrapperProps) {
         {readOnly ? (
           <QuoteSummary form={form} data={defaultValues as QuoteEntity} />
         ) : (
-          <QuoteForm readOnly={readOnly} form={form} />
+          <QuoteForm
+            readOnly={readOnly}
+            form={form}            
+          />
         )}
       </FormPageTemplate>
     </FormProvider>

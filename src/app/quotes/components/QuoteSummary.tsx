@@ -1,11 +1,11 @@
 'use client';
 
-import { FormSection } from "@/components/form/FormSection";
 import { currencyFormat, formatDate, getLabelByValue } from "@/lib/utils";
 import { BillingPeriods, LifeCycleTypes, PaymentForms, PaymentMethods, QuoteStatuses } from "../entity/quote.enum";
 import QuoteItemsTable from "./QuoteItemsTable";
 import { QuoteEntity } from "../entity/quote.entity";
 import { useForm, useWatch } from "react-hook-form";
+import { FormCard } from "@/components/form/FormCard";
 
 interface QuoteSummaryProps {
   data: QuoteEntity;  
@@ -19,7 +19,7 @@ export function QuoteSummary({ data, form }: QuoteSummaryProps) {
   return (
     <div className="space-y-8">
       {/* Dados Gerais*/}
-      <FormSection title="Dados Gerais">
+      <FormCard title="Dados Gerais">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
           <SummaryItem label="Identificador" value={'#' + data.code} />
           <SummaryItem
@@ -61,13 +61,13 @@ export function QuoteSummary({ data, form }: QuoteSummaryProps) {
             value={formatDate(data.expirationDate)}
           />
         </div>
-      </FormSection>
+      </FormCard>
       <div>
-        <FormSection title="Detalhes">
+        <FormCard title="Produtos/Serviços">
           <div className="height-full flex-shrink-0 w-full">
             <QuoteItemsTable quoteItems={items} form={form} readOnly={true} />
           </div>
-        </FormSection>
+        </FormCard>
       </div>
     </div>
   );

@@ -7,6 +7,7 @@ import { ConfirmDeleteDialog } from "@/components/shared/dialogs/ConfirmDeleteDi
 import { QuoteStatuses } from "../entity/quote.enum";
 import { useState } from "react";
 import { RowActions } from "@/components/shared/table/RowActions";
+import { formatQuoteId } from "../util/quote-util";
 
 
 interface QuoteTableProps {
@@ -46,7 +47,7 @@ export default function QuoteTable(props: QuoteTableProps) {
       selected={selected}
       loading={loading}
       columns={[
-        { label: '#Id', field: 'code' },
+        { label: '#Id', field: 'code', format: (code: string) => formatQuoteId(code) },
         {
           label: 'Cliente',
           field: 'customer',
@@ -100,7 +101,7 @@ export default function QuoteTable(props: QuoteTableProps) {
               </button>
             }
             title="Excluir orçamento"
-            description={`Tem certeza que deseja excluir ${quote.customerId}?\nEsta ação não poderá ser desfeita.`}
+            description={`Tem certeza que deseja excluir ${formatQuoteId(quote.code)}?\nEsta ação não poderá ser desfeita.`}
           />
         </RowActions>
       )}

@@ -12,6 +12,7 @@ import { FilterField, FilterSheetWrapper } from '@/components/shared/forms/Filte
 import { FormButton } from '@/components/form/FormButton';
 import { QuoteFormWrapper } from './components/QuoteFormWrapper';
 import QuoteTable from './components/QuoteTable';
+import { formatQuoteId } from './util/quote-util';
 
 export default function QuotesPage() {
   const [filters, setFilters] = useState<Record<string, FilterValue>>({});
@@ -48,9 +49,12 @@ export default function QuotesPage() {
 
   const { show: showError } = useApiErrorToast();
 
-  const handleSubmit = async (data: QuoteEntity) => {        
+  const handleSubmit = async (data: QuoteEntity) => {   
+    
+    
     try {
-        const dataToSave = sanitizeForm(new QuoteFormDto(data));       
+        const dataToSave = sanitizeForm(new QuoteFormDto(data));            
+        
         if (itemBeingEdited) {        
             await update(itemBeingEdited.id, dataToSave);
             toast.success('Orçamento atualizado com sucesso!');
@@ -88,38 +92,40 @@ const filterFields: FilterField[] = [
   { name: 'isActive', label: 'Ativo', type: 'boolean' },      
 ];
 
+const quoteId = itemBeingEdited ? formatQuoteId(itemBeingEdited.code) : "";
+
 return (
   <AppShell>
     <div className="p-6 space-y-4">
       <div className="flex justify-between items-center">
-            <h1 className="text-2xl font-bold">Orçamentos</h1>
-            <div className="flex gap-2">
-            {!isFormOpen && (
+        {!isFormOpen && <h1 className="text-2xl font-bold">Orçamentos</h1>}
+
+        <div className="flex gap-2">
+          {!isFormOpen && (
+            <>
               <FilterSheetWrapper
                 fields={filterFields}
                 filters={filters}
                 onChange={(newFilters) => {
                   setFilters(newFilters);
-                  setPage(1); 
+                  setPage(1);
                 }}
               />
-            )}
-            {!isFormOpen && (
-              <FormButton onClick={() => openForm()}>
-                Novo Orçamento
-              </FormButton>
-            )}
+              <FormButton onClick={() => openForm()}>Novo Orçamento</FormButton>
+            </>
+          )}
         </div>
       </div>
       {isFormOpen ? (
         <QuoteFormWrapper
-            title='Orçamento'
-            defaultValues={itemBeingEdited ?? undefined}
-            isEditing={isEditing}
-            readOnly={isViewing}
-            onSubmit={handleSubmit}
-            onCancel={cancelForm}
-            loading={loading}
+          title="Orçamento"
+          identifier={quoteId}
+          defaultValues={itemBeingEdited ?? undefined}
+          isEditing={isEditing}
+          readOnly={isViewing}
+          onSubmit={handleSubmit}
+          onCancel={cancelForm}
+          loading={loading}
         />
       ) : (
         <QuoteTable

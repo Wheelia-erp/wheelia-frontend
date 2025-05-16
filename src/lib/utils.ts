@@ -26,12 +26,28 @@ export function undefinedWhenEmpty(value: string | undefined) {
   return value;
 }
 
-export function sanitizeForm(data: BaseFormDto) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function sanitizeForm(data: BaseFormDto): any {
   return Object.fromEntries(
-    Object.entries(data).map(([key, value]) => [
-      key,
-      value === '' ? undefined : value,
-    ])
+    Object.entries(data).map(([key, value]) => {
+      if (value === '') {
+        return [key, undefined];
+      }
+      if (Array.isArray(value)) {
+        return [
+          key,
+          value.map((item) =>
+            typeof item === 'object' && item !== null
+              ? sanitizeForm(item)
+              : item
+          ),
+        ];
+      }
+      if (typeof value === 'object' && value !== null) {
+        return [key, sanitizeForm(value)];
+      }
+      return [key, value];
+    })
   );
 }
 

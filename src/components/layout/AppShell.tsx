@@ -35,17 +35,19 @@ export default function AppShell({ children }: AppShellProps) {
   }
 
   return (
-    <div>
+    <div className="bg-[#f7fafa] min-h-screen flex flex-col">
       <Topbar />
-      <Sidebar collapsed={collapsed} />
-      <main
-        className="pt-16 transition-all duration-300"
-        style={{
-          paddingLeft: collapsed ? '74px' : '250px',
-        }}
-      >
-        {children}
-      </main>
+      <div className="flex">
+        <Sidebar collapsed={collapsed} />
+        <main
+           className="pt-16 transition-all duration-300 w-full px-6"
+           style={{
+             paddingLeft: collapsed ? '74px' : '250px',
+           }}
+        >
+          {children}
+        </main>
+      </div>
     </div>
   );
 }

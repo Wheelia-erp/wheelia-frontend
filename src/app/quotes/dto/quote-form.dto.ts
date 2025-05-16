@@ -57,7 +57,7 @@ export class QuoteFormDto extends BaseFormDto {
   constructor(entity?: QuoteEntity) {
     super();
     Object.assign(this, {
-      code: entity?.code || undefined,
+      id: entity?.id || undefined,
       customerId: entity?.customerId || '',
       status: entity?.status || QuoteStatuses.DRAFT,
       lifeCycleType: entity?.lifeCycleType || LifeCycleTypes.ONE_TIME,
@@ -67,10 +67,7 @@ export class QuoteFormDto extends BaseFormDto {
       paymentMethod: entity?.paymentMethod || PaymentMethods.CASH,
       total: entity?.items?.reduce((total, item) => total + item.total, 0) || 0,
       expirationDate: entity?.expirationDate,
-      items:
-        entity?.items?.map((item) => {
-          return new QuoteItemFormDto(item);
-        }) || [],
+      items: entity?.items?.map((item) => new QuoteItemFormDto(item)),
     });
   }
 }

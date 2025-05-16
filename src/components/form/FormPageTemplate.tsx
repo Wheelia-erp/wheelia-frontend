@@ -5,7 +5,8 @@ import { FormBreadcrumb } from '@/components/form/FormBreadcrumb';
 import { FormLoadingOverlay } from '@/components/form/FormLoadingOverlay';
 
 interface FormPageTemplateProps {
-  title: string;  
+  title: string;
+  identifier?: string;
   breadcrumbItems?: {
     label: string;
     href?: string;
@@ -22,29 +23,36 @@ interface FormPageTemplateProps {
 
 export function FormPageTemplate({
   title,
+  identifier,
   breadcrumbItems,
   children,
   actions,
   loading = false,  
+  // eslint-disable-next-line no-unused-vars
   isEditing,    
+  // eslint-disable-next-line no-unused-vars
   readOnly,
   onSubmit,
 }: FormPageTemplateProps) {
-  const contextTitle =
-    !readOnly && isEditing
-      ? "Editar"
-      : readOnly && !isEditing
-      ? "Visualizar"
-      : "Cadastrar";
+  
   return (
     <form onSubmit={onSubmit} className="h-full">
       <div className="relative min-h-screen flex flex-col">
         <FormLoadingOverlay loading={loading} />
 
         {/* Cabeçalho */}
-        <div className="px-6 py-4 border-b space-y-2">
-          {breadcrumbItems && <FormBreadcrumb items={breadcrumbItems} />}
-          <h1 className="text-2xl font-bold">{contextTitle + " " + title}</h1>
+        <div className="sticky top-16 bg-white border-t p-4 gap-2 shadow-md border-b z-10">
+          <div className="flex justify-between items-center">
+            <div className="flex gap-2">
+              <h1 className="text-2xl font-bold">{title}</h1>
+              <h1 className="text-2xl text-gray-500">{identifier}</h1>
+            </div>
+            {breadcrumbItems && <FormBreadcrumb items={breadcrumbItems} />}
+          </div>
+          <div className="text-gray-400 italic text-1x1 text-sm">
+            Criado em {new Date().toLocaleDateString('pt-BR')} e atualizado em{' '}
+            {new Date().toLocaleDateString('pt-BR')}
+          </div>
         </div>
 
         {/* Conteúdo */}

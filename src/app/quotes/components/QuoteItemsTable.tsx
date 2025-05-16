@@ -15,6 +15,7 @@ interface QuoteItemsTableProps {
 
 export default function QuoteItemsTable(props: QuoteItemsTableProps) {
   const { quoteItems, loading } = props;  
+  
   const [items, setItems] = useState<QuoteItemEntity[]>(quoteItems ?? []);
 
   const [selectedItem, setSelectedItem] = useState(false); 
