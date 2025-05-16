@@ -1,8 +1,8 @@
 'use client';
 
 import { CustomerFormDto } from '@/app/customers/dto/customer-form.dto';
-import { FormSection } from '@/components/form/FormSection';
 import { formatDate } from '@/lib/utils';
+import { FormCard } from '../form/FormCard';
 
 interface CustomerSummaryProps {
   data: CustomerFormDto;
@@ -12,7 +12,7 @@ export function CustomerSummary({ data }: CustomerSummaryProps) {
   return (
     <div className="space-y-8">
       {/* Dados Gerais */}
-      <FormSection title="Dados Gerais">
+      <FormCard title="Dados Gerais">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
           <SummaryItem
             label="Tipo de Pessoa"
@@ -30,10 +30,10 @@ export function CustomerSummary({ data }: CustomerSummaryProps) {
           />
           <SummaryItem label="Referência" value={data.reference} />
         </div>
-      </FormSection>
+      </FormCard>
 
       {/* Informações Adicionais */}
-      <FormSection title="Informações Adicionais">
+      <FormCard title="Informações Adicionais">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
           <SummaryItem label="E-mail" value={data.email} />
           <SummaryItem label="Telefone Comercial" value={data.phone} />
@@ -51,10 +51,10 @@ export function CustomerSummary({ data }: CustomerSummaryProps) {
             />
           )}
         </div>
-      </FormSection>
+      </FormCard>
 
       {/* Endereço */}
-      <FormSection title="Endereço">
+      <FormCard title="Endereço">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
           <SummaryItem label="País" value={data.country} />
           <SummaryItem label="CEP" value={data.zipCode} />
@@ -65,14 +65,14 @@ export function CustomerSummary({ data }: CustomerSummaryProps) {
           <SummaryItem label="Bairro" value={data.neighborhood} />
           <SummaryItem label="Complemento" value={data.complement} />
         </div>
-      </FormSection>
+      </FormCard>
 
       {/* Observações */}
-      <FormSection title="Observações">
+      <FormCard title="Observações">
         <div className="p-3 bg-gray-50 rounded border text-sm text-gray-700 whitespace-pre-line">
           {data.notes || "Nenhuma observação informada."}
         </div>
-      </FormSection>
+      </FormCard>
     </div>
   );
 }

@@ -1,10 +1,10 @@
 'use client';
 
-import { QuoteEntity, QuoteItemEntity } from "../entity/quote.entity";
-import { useEffect, useState } from "react";
 import GenericTable from "@/components/shared/table/GenericTable";
-import { useForm } from "react-hook-form";
 import { currencyFormat } from "@/lib/utils";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { QuoteEntity, QuoteItemEntity } from "../entity/quote.entity";
 
 interface QuoteItemsTableProps {
   quoteItems: QuoteItemEntity[];
@@ -14,8 +14,7 @@ interface QuoteItemsTableProps {
 }
 
 export default function QuoteItemsTable(props: QuoteItemsTableProps) {
-  const { quoteItems, loading } = props;  
-  
+  const { quoteItems, loading } = props;    
   const [items, setItems] = useState<QuoteItemEntity[]>(quoteItems ?? []);
 
   const [selectedItem, setSelectedItem] = useState(false); 

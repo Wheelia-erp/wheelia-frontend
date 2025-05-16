@@ -1,8 +1,8 @@
 'use client';
 
-import { ReactNode } from 'react';
 import { FormBreadcrumb } from '@/components/form/FormBreadcrumb';
 import { FormLoadingOverlay } from '@/components/form/FormLoadingOverlay';
+import { ReactNode } from 'react';
 
 interface FormPageTemplateProps {
   title: string;
@@ -41,7 +41,7 @@ export function FormPageTemplate({
         <FormLoadingOverlay loading={loading} />
 
         {/* Cabeçalho */}
-        <div className="sticky top-16 bg-white border-t p-4 gap-2 shadow-md border-b z-10">
+        <div className="sticky top-16 bg-white border-t p-4 gap-2 rounded-lg shadow-sm border-b z-10">
           <div className="flex justify-between items-center">
             <div className="flex gap-2">
               <h1 className="text-2xl font-bold">{title}</h1>
@@ -60,7 +60,7 @@ export function FormPageTemplate({
 
         {/* Rodapé fixo */}
         {actions && (
-          <div className="sticky bottom-0 bg-white border-t p-4 flex justify-end gap-2 shadow-md">
+          <div className="sticky bottom-0 bg-white border-t p-4 flex justify-end gap-2 rounded-lg shadow-sm">
             {actions}
           </div>
         )}

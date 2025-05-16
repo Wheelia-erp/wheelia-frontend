@@ -1,6 +1,7 @@
 'use client';
 
 import { ReactNode } from 'react';
+import { FormCard } from './FormCard';
 
 interface FormSectionProps {
   title: string;
@@ -10,14 +11,10 @@ interface FormSectionProps {
 
 export function FormSection({ title, children, titleAction }: FormSectionProps) {
   return (
-    <section className="space-y-4">
-      <div className="flex justify-between items-center border-b pb-2">
-        <h3 className="text-lg font-semibold">{title}</h3>
-        {titleAction && <div className="flex items-center gap-2">{titleAction}</div>}
-      </div>
+    <FormCard title={title} titleAction={titleAction} >
       {children}
-    </section>
+    </FormCard>
   );
 }
-
+    
 
