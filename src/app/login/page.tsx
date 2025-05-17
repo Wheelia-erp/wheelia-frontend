@@ -27,8 +27,7 @@ export default function LoginPage() {
     }
   };
 
-  return (  
-
+  return (
     <div className="min-h-screen flex bg-blue-50">
       <div className="fixed top-0 left-0 right-0 z-30 h-16 flex justify-between items-center px-6 bg-[#1E293B] text-white shadow">
         <div className="container mx-auto px-4 flex items-center justify-between">

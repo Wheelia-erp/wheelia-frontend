@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
 import { FormButton } from '@/components/form/FormButton';
-import { Sheet, SheetClose, SheetContent, SheetFooter, SheetHeader, SheetTitle } from '@/components/ui/sheet';
-import { QuoteItemEntity } from '../entity/quote.entity';
-import ProductLookup from '@/components/products/lookups/ProductLookup';
-import { FormInput } from '@/components/form/FormInput';
-import { currencyFormat } from '@/lib/utils';
 import { FormFieldWrapper } from '@/components/form/FormFieldWrapper';
+import { FormInput } from '@/components/form/FormInput';
+import ProductLookup from '@/components/products/lookups/ProductLookup';
+import { Sheet, SheetClose, SheetContent, SheetFooter, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { currencyFormat } from '@/lib/utils';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
+import { QuoteItemEntity } from '../entity/quote.entity';
 
 interface QuoteItemAddProps {
   className?: string;
@@ -47,7 +47,7 @@ export default function QuoteItemAdd(props: QuoteItemAddProps) {
 
   return (
     <div className={className}>
-      <FormButton type="button" onClick={() => setOpen(true)}>
+      <FormButton type="button" onClick={() => setOpen(true)} className="mb-5">
         Adicionar Item
       </FormButton>
 

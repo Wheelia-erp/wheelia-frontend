@@ -1,18 +1,16 @@
-import { useForm, useWatch } from "react-hook-form";
-import { QuoteEntity, QuoteItemEntity } from "../entity/quote.entity";
-import { FormSection } from "@/components/form/FormSection";
-import { FormFieldWrapper } from "@/components/form/FormFieldWrapper";
-import QuoteItemsTable from "./QuoteItemsTable";
 import CustomerLookup from "@/components/customers/lookups/CustomerLookup";
+import { FormCard } from "@/components/form/FormCard";
+import { FormFieldWrapper } from "@/components/form/FormFieldWrapper";
 import { FormInputDate } from "@/components/form/FormInputDate";
 import FormSelect from "@/components/form/FormSelect";
-import { BillingPeriods, LifeCycleTypes, PaymentForms, PaymentMethods, QuoteStatuses } from "../entity/quote.enum";
-import QuoteItemAdd from "./QuoteItemAdd";
-import { FormCard } from "@/components/form/FormCard";
-import { FormStepProgress } from "@/components/form/FormStepProgress";
-import { CheckCircle, Pencil, Send, XCircle } from "lucide-react";
-import QuoteTotalDisplay from "./QuoteTotalDisplay";
 import { useEffect, useState } from "react";
+import { useForm, useWatch } from "react-hook-form";
+import { QuoteEntity, QuoteItemEntity } from "../entity/quote.entity";
+import { BillingPeriods, LifeCycleTypes, PaymentForms, PaymentMethods } from "../entity/quote.enum";
+import QuoteItemAdd from "./QuoteItemAdd";
+import QuoteItemsTable from "./QuoteItemsTable";
+import QuoteStatusView from "./QuoteStatus";
+import QuoteTotalDisplay from "./QuoteTotalDisplay";
 
 interface QuoteFormProps {  
   readOnly?: boolean;
@@ -42,45 +40,10 @@ export default function QuoteForm({ readOnly, form }: QuoteFormProps) {
     form.setValue('items', [...items]);
   };
 
-  const quoteStatus = form.getValues('status'); // Pode ser "draft", "pending", "approved", "rejected"
-
-  const steps = [
-    {
-      label: 'Em elaboração',
-      icon: <Pencil size={24} />,
-      color: '#6B7280', // Cinza
-      date: '11/05/2025',
-      current: quoteStatus === QuoteStatuses.DRAFT.value,
-    },
-    {
-      label: 'Aguardando aprovação',
-      icon: <Send size={24} />,
-      color: '#F59E0B', // Amarelo
-      current: quoteStatus === QuoteStatuses.SENT.value,
-    },
-  ];
-  
-  if (quoteStatus === "rejected") {
-    steps.push({
-      label: "Reprovado",
-      icon: <XCircle size={24} />,
-      color: "#EF4444", // Vermelho
-      current: quoteStatus === QuoteStatuses.REJECTED.value,
-    });
-  } else {
-    steps.push({
-      label: "Aprovado",
-      icon: <CheckCircle size={24} />,
-      color: "#10B981", // Verde
-      current: quoteStatus === QuoteStatuses.ACCEPTED.value,
-    });
-  }
-  
+    
   return (
     <>
-      <FormCard className="w-full">
-        <FormStepProgress steps={steps} />
-      </FormCard>
+      <QuoteStatusView quoteStatus={form.getValues('status')} />      
 
       <FormCard title="Para Quem e Sobre o Quê?">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -126,13 +89,12 @@ export default function QuoteForm({ readOnly, form }: QuoteFormProps) {
           </FormFieldWrapper>
         </div>
       </FormCard>
-      <FormCard>
-        <FormSection
+      <FormCard 
           title="Quais são os produtos e serviços?"          
           titleAction={!readOnly && <QuoteItemAdd onAdd={handleAddItem} />}
         >
-          <QuoteItemsTable quoteItems={items} form={form} readOnly={readOnly} />
-        </FormSection>
+        <QuoteItemsTable quoteItems={items} form={form} readOnly={readOnly} />
+        
       </FormCard>
     </>
   );
