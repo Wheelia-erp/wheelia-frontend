@@ -1,11 +1,11 @@
-import { ReactNode } from 'react';
 import Table from '@/components/shared/table/Table';
-import TableHead from '@/components/shared/table/TableHead';
 import TableBody from '@/components/shared/table/TableBody';
+import TableCell from '@/components/shared/table/TableCell';
+import TableHead from '@/components/shared/table/TableHead';
 import TableHeader from '@/components/shared/table/TableHeader';
 import TableRow from '@/components/shared/table/TableRow';
-import TableCell from '@/components/shared/table/TableCell';
 import { cn } from '@/lib/utils';
+import { ReactNode } from 'react';
 import TableEmpty from './TableEmpty';
 
 interface Column<T> {
@@ -16,7 +16,7 @@ interface Column<T> {
 }
 
 interface GenericTableProps<T> {
-  selected: boolean;
+  selected?: boolean;
   columns: Column<T>[];
   data: T[];
   loading?: boolean;
@@ -93,9 +93,11 @@ export default function GenericTable<T>(
             )}>
             {columns.map((col) => (
               <TableCell key={col.field as string}>
-                {col.format
-                  ? col.format(item[col.field])
-                  : (item[col.field] as ReactNode)}
+                {
+                  col.format
+                    ? col.format(item[col.field])
+                    : (item[col.field] as ReactNode)
+                }
               </TableCell>
             ))}
             {actions && <TableCell>{actions(item)}</TableCell>}

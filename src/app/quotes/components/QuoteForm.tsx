@@ -1,18 +1,16 @@
-import { useForm, useWatch } from "react-hook-form";
-import { QuoteEntity, QuoteItemEntity } from "../entity/quote.entity";
-import { FormSection } from "@/components/form/FormSection";
-import { FormFieldWrapper } from "@/components/form/FormFieldWrapper";
-import QuoteItemsTable from "./QuoteItemsTable";
 import CustomerLookup from "@/components/customers/lookups/CustomerLookup";
+import { FormButton } from "@/components/form/FormButton";
+import { FormCard } from "@/components/form/FormCard";
+import { FormFieldWrapper } from "@/components/form/FormFieldWrapper";
 import { FormInputDate } from "@/components/form/FormInputDate";
 import FormSelect from "@/components/form/FormSelect";
-import { BillingPeriods, LifeCycleTypes, PaymentForms, PaymentMethods, QuoteStatuses } from "../entity/quote.enum";
-import QuoteItemAdd from "./QuoteItemAdd";
-import { FormCard } from "@/components/form/FormCard";
-import { FormStepProgress } from "@/components/form/FormStepProgress";
-import { CheckCircle, Pencil, Send, XCircle } from "lucide-react";
-import QuoteTotalDisplay from "./QuoteTotalDisplay";
 import { useEffect, useState } from "react";
+import { useForm, useWatch } from "react-hook-form";
+import { QuoteEntity, QuoteItemEntity } from "../entity/quote.entity";
+import { BillingPeriods, LifeCycleTypes, PaymentForms, PaymentMethods } from "../entity/quote.enum";
+import QuoteItemModal from "./QuoteItemModal";
+import QuoteItemsTable from "./QuoteItemsTable";
+import QuoteStatusView from "./QuoteStatus";
 
 interface QuoteFormProps {  
   readOnly?: boolean;
@@ -21,66 +19,69 @@ interface QuoteFormProps {
 
 export default function QuoteForm({ readOnly, form }: QuoteFormProps) {
   const items = useWatch({ control: form.control, name: 'items' }) ?? [];
-  const [total, setTotal] = useState(0);
+  items.forEach(item => {item.tempId = item.id});
+
+  const [isQuoteItemModalOpen, setIsQuoteItemModalOpen] = useState(false);
+  const [editingQuoteItem, setEditingQuoteItem] = useState<QuoteItemEntity | null>(null);
+
+  const handleOpenQuoteItemModal = (item?: QuoteItemEntity) => {
+    setEditingQuoteItem(item || null);
+    setIsQuoteItemModalOpen(true);
+  };
+
+  const handleCloseQuoteItemModal = () => {
+    setIsQuoteItemModalOpen(false);
+    setEditingQuoteItem(null);
+  };
+
+  const handleQuoteItemSubmit = (submittedItem: QuoteItemEntity) => {
+    const currentItems = form.getValues('items') || [];
+    currentItems.forEach(item => {item.tempId = item.id});
+    let newItems;
+   
+    const itemWithTempId = {
+      ...submittedItem,
+      quoteId: form.getValues('id'), 
+      tempId: submittedItem.id || editingQuoteItem?.id || crypto.randomUUID(),
+    };
+
+
+    if (editingQuoteItem) { 
+      const itemIndex = currentItems.findIndex(it => it.tempId === editingQuoteItem.tempId);
+      if (itemIndex >= 0) {
+        newItems = [...currentItems];
+        newItems[itemIndex] = itemWithTempId;
+      } else {        
+        newItems = [...currentItems, itemWithTempId];
+      }
+    } else { 
+      newItems = [...currentItems, itemWithTempId];
+    }
+    
+    form.setValue('items', newItems, { shouldValidate: true, shouldDirty: true });
+    handleCloseQuoteItemModal();
+  };
+
+  const handleDeleteQuoteItem = (itemToDelete: QuoteItemEntity) => {
+    const currentItems = form.getValues('items') || [];
+    currentItems.forEach(item => {item.tempId = item.id});
+    const newItems = currentItems.filter(item => item.tempId !== itemToDelete.tempId);
+    form.setValue('items', newItems, { shouldValidate: true, shouldDirty: true });
+  };
 
   useEffect(() => {
     const totalValue = items.reduce(
       (acc, item) => acc + (item.quantity * item.unitPrice - item.discount) ,
       0
     );
-    setTotal(totalValue);
-  }, [items]);
-
-  const handleAddItem = (quoteItem: QuoteItemEntity) => {   
-    quoteItem.quoteId = form.getValues("id"); 
-    const quoteItemIndex = (quoteItem.id && items.findIndex(item => item.id === quoteItem.id));    
-    if (quoteItemIndex && quoteItemIndex >= 0) {
-      items.splice(quoteItemIndex, 1, quoteItem);
-    } else {
-      items.push(quoteItem);
+    if (totalValue !== form.getValues('total')) {
+      form.setValue('total', totalValue, { shouldValidate: true, shouldDirty: true });    
     }
-    form.setValue('items', [...items]);
-  };
-
-  const quoteStatus = form.getValues('status'); // Pode ser "draft", "pending", "approved", "rejected"
-
-  const steps = [
-    {
-      label: 'Em elaboração',
-      icon: <Pencil size={24} />,
-      color: '#6B7280', // Cinza
-      date: '11/05/2025',
-      current: quoteStatus === QuoteStatuses.DRAFT.value,
-    },
-    {
-      label: 'Aguardando aprovação',
-      icon: <Send size={24} />,
-      color: '#F59E0B', // Amarelo
-      current: quoteStatus === QuoteStatuses.SENT.value,
-    },
-  ];
-  
-  if (quoteStatus === "rejected") {
-    steps.push({
-      label: "Reprovado",
-      icon: <XCircle size={24} />,
-      color: "#EF4444", // Vermelho
-      current: quoteStatus === QuoteStatuses.REJECTED.value,
-    });
-  } else {
-    steps.push({
-      label: "Aprovado",
-      icon: <CheckCircle size={24} />,
-      color: "#10B981", // Verde
-      current: quoteStatus === QuoteStatuses.ACCEPTED.value,
-    });
-  }
-  
+  }, [items]);
+    
   return (
     <>
-      <FormCard className="w-full">
-        <FormStepProgress steps={steps} />
-      </FormCard>
+      <QuoteStatusView quoteStatus={form.getValues('status')} />
 
       <FormCard title="Para Quem e Sobre o Quê?">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -88,25 +89,26 @@ export default function QuoteForm({ readOnly, form }: QuoteFormProps) {
             label="Para quem é este orçamento?"
             required={!readOnly}
             className="col-span-2"
-          >            
-            <CustomerLookup name="customerId"   initialValue={{ id: form.getValues("customerId"), name: form.getValues("customer.name") }}
-          />
+            error={form.formState.errors.customerId?.message}
+          >
+            <CustomerLookup
+              name="customerId"
+              initialValue={{
+                id: form.getValues('customerId'),
+                name: form.getValues('customer.name'),
+              }}
+            />
           </FormFieldWrapper>
           <FormFieldWrapper
             label="Qual o tipo desta venda?"
-            required={!readOnly}                        
+            required={!readOnly}
           >
             <FormSelect name="lifeCycleType" enumSource={LifeCycleTypes} />
           </FormFieldWrapper>
 
           <FormFieldWrapper label="Este orçamento é válido até quando?">
             <FormInputDate {...form.register('expirationDate')} />
-          </FormFieldWrapper>
-
-          <FormFieldWrapper label="Total" 
-            className="col-span-2">
-            <QuoteTotalDisplay total={total} />
-          </FormFieldWrapper>
+          </FormFieldWrapper>          
         </div>
       </FormCard>
 
@@ -126,14 +128,35 @@ export default function QuoteForm({ readOnly, form }: QuoteFormProps) {
           </FormFieldWrapper>
         </div>
       </FormCard>
-      <FormCard>
-        <FormSection
-          title="Quais são os produtos e serviços?"          
-          titleAction={!readOnly && <QuoteItemAdd onAdd={handleAddItem} />}
-        >
-          <QuoteItemsTable quoteItems={items} form={form} readOnly={readOnly} />
-        </FormSection>
+      <FormCard
+        title="Quais são os produtos e serviços?"
+        titleAction={
+          !readOnly && (
+            <FormButton
+              type="button"              
+              onClick={() => handleOpenQuoteItemModal()}
+            >
+              Adicionar Item
+            </FormButton>
+          )
+        }
+      >
+        <QuoteItemsTable
+          quoteItems={items}
+          form={form}
+          readOnly={readOnly}
+          onEditItem={(item) => handleOpenQuoteItemModal(item)}
+          onDeleteItem={(item) => handleDeleteQuoteItem(item)}
+        />
       </FormCard>
+      {!readOnly && (
+        <QuoteItemModal
+          isOpen={isQuoteItemModalOpen}
+          onClose={handleCloseQuoteItemModal}
+          onSubmit={handleQuoteItemSubmit}
+          itemToEdit={editingQuoteItem}
+        />
+      )}
     </>
   );
 }

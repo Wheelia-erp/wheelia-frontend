@@ -2,6 +2,7 @@
 
 import { FormBreadcrumb } from '@/components/form/FormBreadcrumb';
 import { FormLoadingOverlay } from '@/components/form/FormLoadingOverlay';
+import { ChevronLeftIcon } from 'lucide-react';
 import { ReactNode } from 'react';
 
 interface FormPageTemplateProps {
@@ -17,8 +18,11 @@ interface FormPageTemplateProps {
   isViewing?: boolean;
   isEditing?: boolean;
   readOnly?: boolean;
+  headerChildLeft?: ReactNode;
+  headerChildRight?: ReactNode;
   // eslint-disable-next-line no-unused-vars
   onSubmit?: (e: React.FormEvent<HTMLFormElement>) => void;
+  onCancel?: () => void;
 }
 
 export function FormPageTemplate({
@@ -32,7 +36,10 @@ export function FormPageTemplate({
   isEditing,    
   // eslint-disable-next-line no-unused-vars
   readOnly,
+  headerChildLeft,
+  headerChildRight,
   onSubmit,
+  onCancel,
 }: FormPageTemplateProps) {
   
   return (
@@ -43,15 +50,31 @@ export function FormPageTemplate({
         {/* Cabeçalho */}
         <div className="sticky top-16 bg-white border-t p-4 gap-2 rounded-lg shadow-sm border-b z-10">
           <div className="flex justify-between items-center">
-            <div className="flex gap-2">
-              <h1 className="text-2xl font-bold">{title}</h1>
-              <h1 className="text-2xl text-gray-500">{identifier}</h1>
+            <div className="flex justify-between items-center gap-2">
+              <button
+                  type="button"
+                  title="Voltar"
+                  onClick={onCancel}>
+                  <ChevronLeftIcon
+                    className="h-8 w-8 cursor-pointer text-gray-500 hover:text-gray-700"
+                  />
+                </button>
+              <div className="flex flex-col items-initial">
+                <div className="flex items-end">
+                  <div className="flex items-center gap-2">                 
+                    <h1 className="text-2xl font-bold">{title}</h1>
+                  </div>
+                  <h1 className="text-3xl font-semibold text-gray-500 pl-4">
+                    {identifier}
+                  </h1>
+                </div>
+                {headerChildLeft ? <div>{headerChildLeft}</div> : null}
+              </div>
             </div>
-            {breadcrumbItems && <FormBreadcrumb items={breadcrumbItems} />}
-          </div>
-          <div className="text-gray-400 italic text-1x1 text-sm">
-            Criado em {new Date().toLocaleDateString('pt-BR')} e atualizado em{' '}
-            {new Date().toLocaleDateString('pt-BR')}
+            <div className="flex flex-col items-end">
+              {breadcrumbItems && <FormBreadcrumb items={breadcrumbItems} />}
+              {headerChildRight ? <div>{headerChildRight}</div> : null}
+            </div>
           </div>
         </div>
 

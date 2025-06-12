@@ -19,6 +19,21 @@ export function formatDate(date: string | Date | undefined | null) {
   }).format(parsedDate);
 }
 
+export function formatDatetime(date: string | Date | undefined | null) {
+  if (!date) return '';
+
+  const parsedDate = typeof date === 'string' ? new Date(date) : date;
+
+  return new Intl.DateTimeFormat('pt-BR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  }).format(parsedDate);
+}
+
 export function undefinedWhenEmpty(value: string | undefined) {
   if (value === undefined || value === '') {
     return undefined;

@@ -1,4 +1,7 @@
+import { CustomerFormDto } from '@/app/customers/dto/customer-form.dto';
+import { ProductFormDto } from '@/app/products/dto/product-form.dto';
 import { BaseFormDto } from '@/core/dto/base-form.dto';
+import { QuoteEntity } from '../entity/quote.entity';
 import {
   BillingPeriod,
   BillingPeriods,
@@ -11,9 +14,6 @@ import {
   QuoteStatus,
   QuoteStatuses,
 } from '../entity/quote.enum';
-import { QuoteEntity } from '../entity/quote.entity';
-import { CustomerFormDto } from '@/app/customers/dto/customer-form.dto';
-import { ProductFormDto } from '@/app/products/dto/product-form.dto';
 
 export class QuoteItemFormDto {
   id!: string;
@@ -29,7 +29,6 @@ export class QuoteItemFormDto {
   constructor(entity?: QuoteItemFormDto) {
     Object.assign(this, {
       id: entity?.id || undefined,
-      quoteId: entity?.quoteId || undefined,
       productId: entity?.productId || '',
       description: entity?.description || '',
       unitPrice: entity?.unitPrice || 0,

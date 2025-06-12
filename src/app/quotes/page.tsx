@@ -1,17 +1,17 @@
 'use client';
 
-import AppShell from '@/components/layout/AppShell';
-import { FilterValue, useCrud } from '@/hooks/crud/useCrud';
-import { useState } from 'react';
-import { QuoteEntity } from './entity/quote.entity';
-import { QuoteFormDto } from './dto/quote-form.dto';
-import { useApiErrorToast } from '@/hooks/crud/useApiErrorToast';
-import { sanitizeForm } from '@/lib/utils';
-import { toast } from 'sonner';
-import { FilterField, FilterSheetWrapper } from '@/components/shared/forms/FilterSheetWrapper';
 import { FormButton } from '@/components/form/FormButton';
+import AppShell from '@/components/layout/AppShell';
+import { FilterField, FilterSheetWrapper } from '@/components/shared/forms/FilterSheetWrapper';
+import { useApiErrorToast } from '@/hooks/crud/useApiErrorToast';
+import { FilterValue, useCrud } from '@/hooks/crud/useCrud';
+import { sanitizeForm } from '@/lib/utils';
+import { useState } from 'react';
+import { toast } from 'sonner';
 import { QuoteFormWrapper } from './components/QuoteFormWrapper';
 import QuoteTable from './components/QuoteTable';
+import { QuoteFormDto } from './dto/quote-form.dto';
+import { QuoteEntity } from './entity/quote.entity';
 import { formatQuoteId } from './util/quote-util';
 
 export default function QuotesPage() {
@@ -125,6 +125,7 @@ return (
           readOnly={isViewing}
           onSubmit={handleSubmit}
           onCancel={cancelForm}
+          onEdit={onEdit}
           loading={loading}
         />
       ) : (
