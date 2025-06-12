@@ -5,7 +5,7 @@ const defaultFormatApiResponse = (response: any): any[] => {
 };
 
 import backendApi from "@/lib/backendApi";
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any , no-unused-vars
 const debounce = <T extends (...args: any[]) => void>(
@@ -57,6 +57,8 @@ type LookupAutoCompleteProps = {
   addNewLabel?: string;
   modalFormFields?: ModalField[];
   modalTitle?: string;
+  disabled?: boolean;  
+  id?: string;
   ModalComponent?: React.ComponentType<ModalProps>;
   onAddNewClick?: () => void;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any, no-unused-vars
@@ -84,6 +86,8 @@ const LookupAutoComplete: React.FC<LookupAutoCompleteProps> = ({
   loadingText = "Carregando...",
   allowAddNew = false,
   addNewLabel = "Adicionar Novo",
+  disabled,
+  id = apiUrl.split("/").pop() || "lookup-autocomplete", 
   onAddNewClick,
   ModalComponent,
   modalTitle = "Adicionar Novo Item",
@@ -155,12 +159,11 @@ const LookupAutoComplete: React.FC<LookupAutoCompleteProps> = ({
   useEffect(() => {
     if (initialValue && initialDisplayValue) {
       setSearchTerm(initialDisplayValue);
-      setSelectedValue(initialValue); // Aqui initialValue é o ID, mas selectedValue poderia ser o objeto se disponível
+      setSelectedValue(initialValue); 
     }
   }, [initialValue, initialDisplayValue]);
 
-  useEffect(() => {    
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  useEffect(() => {        
     function handleClickOutside(event: MouseEvent) {
       if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
         setShowSuggestions(false);        
@@ -255,6 +258,8 @@ const LookupAutoComplete: React.FC<LookupAutoCompleteProps> = ({
     <div className="relative w-full" ref={wrapperRef}>
       <input
         ref={inputRef} 
+        id={id}
+        disabled={disabled}
         type="text"
         value={searchTerm}
         onChange={handleChange} 

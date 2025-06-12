@@ -1,3 +1,5 @@
+import { CustomerEntity } from '@/app/customers/entity/customer.entity';
+import { ProductEntity } from '@/app/products/entity/product.entity';
 import { BaseEntity } from '@/core/entity/base.entity';
 import {
   BillingPeriod,
@@ -6,11 +8,10 @@ import {
   PaymentMethod,
   QuoteStatus,
 } from '../entity/quote.enum';
-import { CustomerEntity } from '@/app/customers/entity/customer.entity';
-import { ProductEntity } from '@/app/products/entity/product.entity';
 
 export class QuoteItemEntity {
   id!: string;
+  tempId?: string;
   quoteId!: string;
   productId!: string;
   product!: ProductEntity;
@@ -20,7 +21,9 @@ export class QuoteItemEntity {
   discount!: number;
   total!: number;
   createdAt?: Date | undefined;
+  createdBy?: string;
   updatedAt?: Date | undefined;
+  updatedBy?: string;
 }
 
 export class QuoteEntity implements BaseEntity {
@@ -39,5 +42,7 @@ export class QuoteEntity implements BaseEntity {
   items?: QuoteItemEntity[];
   isActive!: boolean;
   createdAt?: Date | undefined;
+  createdBy?: string;
   updatedAt?: Date | undefined;
+  updatedBy?: string;
 }

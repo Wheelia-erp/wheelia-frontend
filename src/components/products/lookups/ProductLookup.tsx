@@ -1,17 +1,18 @@
-import React, { useEffect } from 'react';
-import { useFormContext, useWatch } from 'react-hook-form';
 import { ProductEntity } from '@/app/products/entity/product.entity';
 import LookupAutoComplete from '@/components/shared/lookup/LookupAutoComplete';
+import React, { useEffect } from 'react';
+import { useFormContext, useWatch } from 'react-hook-form';
 
 interface ProductLookupProps {
-  name: string; // Name of the field in react-hook-form
+  name: string; 
   placeholder?: string;
-  initialValue?: { id: string; name: string }; // Used to set initial display and form value if provided
+  initialValue?: { id: string; name: string };
+  disabled?: boolean;
   // eslint-disable-next-line no-unused-vars
   onSelect?: (item: ProductEntity | null) => void; // Callback with the full selected product or null
 }
 
-const ProductLookup: React.FC<ProductLookupProps> = ({ name, placeholder, initialValue, onSelect }) => {  
+const ProductLookup: React.FC<ProductLookupProps> = ({ name, placeholder, initialValue, disabled, onSelect }) => {  
   const { setValue, control } = useFormContext();
   // useWatch is to observe the form value, which should be the ID
   const watchedFormValue = useWatch({ control, name }) || '';  
@@ -41,22 +42,23 @@ const ProductLookup: React.FC<ProductLookupProps> = ({ name, placeholder, initia
     }
   };
 
-  return (    
+  return (
     <LookupAutoComplete
       apiUrl="/products"
       searchParamName="q"
       displayField="name" // Field from ProductEntity to display in suggestions
-      valueField="id"     // Field from ProductEntity to use as the key (still useful for <li key...)
+      valueField="id" // Field from ProductEntity to use as the key (still useful for <li key...)
       placeholder={placeholder || 'Buscar produto...'}
       // initialValue for LookupAutoComplete is the ID for its internal state if needed for initial selection
-      initialValue={initialValue?.id} 
+      initialValue={initialValue?.id}
       initialDisplayValue={initialValue?.name || ''} // What's shown in the input initially
       onSelect={handleSelect} // This now expects the full ProductEntity or null
       noResultsText="Nenhum produto encontrado"
       loadingText="Carregando produtos..."
       minSearchChars={2}
       debounceTimeout={300}
-      // Ensure your ProductEntity has 'id' and 'name' fields, 
+      disabled={disabled}
+      // Ensure your ProductEntity has 'id' and 'name' fields,
       // and any other fields QuoteItemAdd might need (e.g., price)
     />
   );

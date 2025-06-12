@@ -1,17 +1,26 @@
 'use client';
 
-import { forwardRef } from 'react';
 import { cn } from '@/lib/utils';
+import { forwardRef } from 'react';
 import { FormInput } from './FormInput';
 
 interface MaskedInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  mask: 'cep' | 'cpf' | 'cnpj' | 'phone';
+  mask: 'cep' | 'cpf' | 'cnpj' | 'phone' | 'currency';
 }
 
 export const MaskedInput = forwardRef<HTMLInputElement, MaskedInputProps>(
   ({ mask, className, value, onChange, onBlur, name, ...props }, ref) => {
     const applyMask = (raw: string) => {
       const numbers = raw.replace(/\D/g, '');
+
+      if (mask === 'currency') {
+        value = raw
+            .replace(/\D/g, "") // Remove tudo que não for número
+            .replace(/^0+(?=\d)/, "") // Remove zeros à esquerda
+            .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.")
+            .replace(/(\d+)(\d{2})$/, "$1,$2"); // Formata para moeda
+        
+      }
       if (mask === 'cep') {
         return numbers.replace(/(\d{5})(\d)/, '$1-$2').slice(0, 9);
       }
